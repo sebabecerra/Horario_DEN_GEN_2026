@@ -22,14 +22,18 @@ body {
 .hero h1 { margin:0 0 8px; font-size:2rem; }
 .hero p { margin:0; max-width:760px; color:rgba(255,255,255,.9); line-height:1.55; }
 .controls {
-  margin-top:22px; display:flex; flex-wrap:wrap; gap:14px; align-items:end;
+  margin-top:22px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:16px;
+  align-items:end;
 }
 .control {
   background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:16px; padding:14px 16px;
 }
 .control label { display:block; font-size:.82rem; color:rgba(255,255,255,.82); margin-bottom:8px; font-weight:700; letter-spacing:.02em; }
 select {
-  min-width:320px; max-width:100%; padding:12px 14px; border-radius:12px; border:none; font-size:0.98rem;
+  width:100%; max-width:100%; padding:12px 14px; border-radius:12px; border:none; font-size:0.98rem;
   color:var(--text); background:#fff;
 }
 .summary {
@@ -63,7 +67,7 @@ tbody td {
   padding:16px 14px; border-bottom:1px solid #edf2f8; vertical-align:top;
 }
 tbody tr:last-child td { border-bottom:none; }
-.datebox .day { font-weight:800; }
+.datebox .day { font-weight:800; text-transform:capitalize; }
 .datebox .date { color:var(--muted); font-size:.92rem; margin-top:3px; }
 .course {
   display:inline-block; padding:7px 10px; border-radius:12px; font-weight:800; line-height:1.35;
@@ -97,27 +101,59 @@ tbody tr:last-child td { border-bottom:none; }
     <div class="controls">
       <div class="control">
         <label for="weekSelector">Semana</label>
-        <select id="weekSelector"><option value="2026-01-05">Semana 5-9 Enero 2026</option>
-<option value="2026-01-12">Semana 12-16 Enero 2026</option>
-<option value="2026-01-19">Semana 19-23 Enero 2026</option>
-<option value="2026-01-26">Semana 26-30 Enero 2026</option>
-<option value="2026-03-02">Semana 2-6 Marzo 2026</option>
-<option value="2026-03-09">Semana 9-13 Marzo 2026</option>
-<option value="2026-03-16">Semana 16-20 Marzo 2026</option>
-<option value="2026-03-23">Semana 23-27 Marzo 2026</option>
-<option value="2026-03-30">Semana 30 Marzo - 3 Abril 2026</option>
-<option value="2026-04-06">Semana 6-10 Abril 2026</option>
-<option value="2026-04-13">Semana 13-17 Abril 2026</option>
-<option value="2026-04-20">Semana 20-24 Abril 2026</option>
-<option value="2026-05-04">Semana 4-8 Mayo 2026</option>
-<option value="2026-05-11">Semana 11-15 Mayo 2026</option>
-<option value="2026-05-18">Semana 18-22 Mayo 2026</option>
-<option value="2026-05-25">Semana 25-29 Mayo 2026</option>
-<option value="2026-06-01">Semana 1-5 Junio 2026</option>
-<option value="2026-06-08">Semana 8-12 Junio 2026</option>
-<option value="2026-06-15">Semana 15-19 Junio 2026</option>
-<option value="2026-06-22">Semana 22-26 Junio 2026</option>
-<option value="2026-06-29">Semana 29 Junio - 3 Julio 2026</option></select>
+        <select id="weekSelector">
+          <option value="all">Todas las semanas</option>
+          <option value="2026-01-05">Semana 5-9 Enero 2026</option>
+          <option value="2026-01-12">Semana 12-16 Enero 2026</option>
+          <option value="2026-01-19">Semana 19-23 Enero 2026</option>
+          <option value="2026-01-26">Semana 26-30 Enero 2026</option>
+          <option value="2026-03-02">Semana 2-6 Marzo 2026</option>
+          <option value="2026-03-09">Semana 9-13 Marzo 2026</option>
+          <option value="2026-03-16">Semana 16-20 Marzo 2026</option>
+          <option value="2026-03-23">Semana 23-27 Marzo 2026</option>
+          <option value="2026-03-30">Semana 30 Marzo - 3 Abril 2026</option>
+          <option value="2026-04-06">Semana 6-10 Abril 2026</option>
+          <option value="2026-04-13">Semana 13-17 Abril 2026</option>
+          <option value="2026-04-20">Semana 20-24 Abril 2026</option>
+          <option value="2026-05-04">Semana 4-8 Mayo 2026</option>
+          <option value="2026-05-11">Semana 11-15 Mayo 2026</option>
+          <option value="2026-05-18">Semana 18-22 Mayo 2026</option>
+          <option value="2026-05-25">Semana 25-29 Mayo 2026</option>
+          <option value="2026-06-01">Semana 1-5 Junio 2026</option>
+          <option value="2026-06-08">Semana 8-12 Junio 2026</option>
+          <option value="2026-06-15">Semana 15-19 Junio 2026</option>
+          <option value="2026-06-22">Semana 22-26 Junio 2026</option>
+          <option value="2026-06-29">Semana 29 Junio - 3 Julio 2026</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label for="profSelector">Profesor</label>
+        <select id="profSelector">
+          <option value="all">Todos</option>
+          <option value="Florencia Gabrielli">Florencia Gabrielli</option>
+          <option value="Luis Torres">Luis Torres</option>
+          <option value="Carlos Poblete">Carlos Poblete</option>
+          <option value="Nélyda Campos">Nélyda Campos</option>
+          <option value="Claudio Aqueveque">Claudio Aqueveque</option>
+          <option value="sin_profesor">Sin profesor asignado</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label for="courseSelector">Curso</label>
+        <select id="courseSelector">
+          <option value="all">Todos</option>
+          <option value="Probabilidad y Estadística">Probabilidad y Estadística</option>
+          <option value="Matemática">Matemática</option>
+          <option value="Microeconomía">Microeconomía</option>
+          <option value="Management - DEN3C113">Management - DEN3C113</option>
+          <option value="Research Method - DEN3C114">Research Method - DEN3C114</option>
+          <option value="Fundamentos Económicos de Investigación en Negocios I - DEN3C112">Fundamentos Económicos de Investigación en Negocios I - DEN3C112</option>
+          <option value="Métodos Cuantitativos de la Investigación en Negocios - DEN3C111">Métodos Cuantitativos de la Investigación en Negocios - DEN3C111</option>
+          <option value="Inducción SCL">Inducción SCL</option>
+          <option value="Evaluación">Evaluación</option>
+        </select>
       </div>
     </div>
   </section>
@@ -177,23 +213,75 @@ function renderSummary(rows) {
   `;
 }
 
+function setDefaultWeek(){
+
+const today = new Date()
+const weekday = (today.getDay()+6)%7
+today.setDate(today.getDate()-weekday)
+
+const monday = today.toISOString().slice(0,10)
+
+const selector = document.getElementById("weekSelector")
+
+for(const option of selector.options){
+if(option.value === monday){
+selector.value = monday
+return
+}
+}
+
+selector.value = "all"
+
+}
+
+
+
 function renderWeek() {
   const weekStart = document.getElementById("weekSelector").value;
-  const rows = schedule
-    .filter(r => mondayOf(r.date) === weekStart)
-    .sort((a,b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+  const profValue = document.getElementById("profSelector").value;
+  const courseValue = document.getElementById("courseSelector").value;
 
-  const titleOpt = document.querySelector(`#weekSelector option[value="${weekStart}"]`);
-  document.getElementById("weekTitle").textContent = titleOpt ? titleOpt.textContent : "Semana seleccionada";
-  document.getElementById("weekSubtitle").textContent = rows.length
-    ? `Se encontraron ${rows.length} actividades registradas en la planificación para esta semana.`
-    : "No hay actividades registradas para esta semana en la planificación.";
+  const rows = schedule
+    .filter(r => weekStart === "all" || mondayOf(r.date) === weekStart)
+    .filter(r => {
+      if (profValue === "all") return true;
+      if (profValue === "sin_profesor") return !r.professor;
+      return r.professor === profValue;
+    })
+    .filter(r => {
+      if (courseValue === "all") return true;
+      return r.course === courseValue;
+    })
+    .sort((a,b) => new Date(a.date) - new Date(b.date))
+
+    if(weekStart === "all"){
+      document.getElementById("weekTitle").textContent = "Programación completa";
+    }else{
+      const titleOpt = document.querySelector(`#weekSelector option[value="${weekStart}"]`);
+      document.getElementById("weekTitle").textContent = titleOpt.textContent;
+    }
+  let subtitle = rows.length
+    ? `Se encontraron ${rows.length} actividades registradas en la planificación para esta selección.`
+    : "No hay actividades registradas para esta selección.";
+
+  const subtitleParts = [];
+  if (profValue !== "all") {
+    subtitleParts.push(profValue === "sin_profesor" ? "sin profesor asignado" : `profesor: ${profValue}`);
+  }
+  if (courseValue !== "all") {
+    subtitleParts.push(`curso: ${courseValue}`);
+  }
+  if (subtitleParts.length) {
+    subtitle += ` Filtros activos: ${subtitleParts.join(" · ")}.`;
+  }
+
+  document.getElementById("weekSubtitle").textContent = subtitle;
 
   renderSummary(rows);
 
   const wrap = document.getElementById("tableWrap");
   if (!rows.length) {
-    wrap.innerHTML = `<div class="empty">No hay actividades cargadas para esta semana.</div>`;
+    wrap.innerHTML = `<div class="empty">No hay actividades cargadas para la combinación de filtros seleccionada.</div>`;
     return;
   }
 
@@ -233,6 +321,10 @@ function renderWeek() {
 }
 
 document.getElementById("weekSelector").addEventListener("change", renderWeek);
+document.getElementById("profSelector").addEventListener("change", renderWeek);
+document.getElementById("courseSelector").addEventListener("change", renderWeek);
+
+setDefaultWeek();
 renderWeek();
 </script>
 </body>
