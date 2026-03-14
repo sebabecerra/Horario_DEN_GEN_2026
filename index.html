@@ -4,106 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Horario Académico DEN 2026</title>
-<style>
-:root {
-  --bg:#f3f6fb; --card:#ffffff; --line:#dbe3ef; --text:#132033; --muted:#5c6b80;
-  --blue:#e8f0ff; --green:#eaf8ef; --amber:#fff4df; --rose:#ffeaf0; --violet:#f1ebff; --slate:#eef2f7;
-}
-* { box-sizing:border-box; }
-body {
-  margin:0; padding:32px; background:linear-gradient(180deg,#f8fbff 0%,var(--bg) 100%);
-  color:var(--text); font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-.container { max-width:1150px; margin:0 auto; }
-.hero {
-  background:linear-gradient(135deg,#17365f 0%,#264b7d 55%,#3e6aa6 100%);
-  color:#fff; border-radius:24px; padding:28px 30px; box-shadow:0 18px 42px rgba(18,39,67,.14);
-}
-.hero h1 { margin:0 0 8px; font-size:2rem; }
-.hero p { margin:0; max-width:760px; color:rgba(255,255,255,.9); line-height:1.55; }
-.controls {
-  margin-top:22px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:16px;
-  align-items:end;
-}
-.control {
-  background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:16px; padding:14px 16px;
-}
-.control label { display:block; font-size:.82rem; color:rgba(255,255,255,.82); margin-bottom:8px; font-weight:700; letter-spacing:.02em; }
-select {
-  width:100%; max-width:100%; padding:12px 14px; border-radius:12px; border:none; font-size:0.98rem;
-  color:var(--text); background:#fff;
-}
-.calendar-btn{
-  width:100%;
-  height:48px;
-  padding:0 18px;
-  border-radius:12px;
-  border:none;
-  background:#ffffff;
-  color:#17365f;
-  font-weight:700;
-  cursor:pointer;
-  font-size:.95rem;
-}
-.summary {
-  margin:24px 0 18px; display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px;
-}
-.sum-card {
-  background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; box-shadow:0 8px 24px rgba(18,39,67,.06);
-}
-.sum-card .k { font-size:1.65rem; font-weight:800; margin-bottom:4px; }
-.sum-card .v { color:var(--muted); font-size:.92rem; }
-.panel {
-  background:var(--card); border:1px solid var(--line); border-radius:22px; padding:22px; box-shadow:0 12px 28px rgba(18,39,67,.06);
-}
-.panel-head {
-  display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px;
-}
-.panel-head h2 { margin:0; font-size:1.25rem; }
-.panel-head p { margin:6px 0 0; color:var(--muted); }
-.legend { display:flex; flex-wrap:wrap; gap:8px; }
-.badge {
-  display:inline-flex; align-items:center; padding:6px 10px; border-radius:999px; font-size:.8rem; font-weight:700;
-}
-.b-blue{background:var(--blue)} .b-green{background:var(--green)} .b-amber{background:var(--amber)}
-.b-rose{background:var(--rose)} .b-violet{background:var(--violet)} .b-slate{background:var(--slate)}
-table { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; }
-thead th {
-  text-align:left; font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted);
-  padding:12px 14px; background:#f9fbfe; border-bottom:1px solid var(--line);
-}
-tbody td {
-  padding:16px 14px; border-bottom:1px solid #edf2f8; vertical-align:top;
-}
-tbody tr:last-child td { border-bottom:none; }
-.datebox .day { font-weight:800; text-transform:capitalize; }
-.datebox .date { color:var(--muted); font-size:.92rem; margin-top:3px; }
-.course {
-  display:inline-block; padding:7px 10px; border-radius:12px; font-weight:800; line-height:1.35;
-}
-.meta { color:var(--muted); font-size:.9rem; line-height:1.5; }
-.empty {
-  padding:36px 18px; text-align:center; color:var(--muted); border:1px dashed var(--line); border-radius:16px; background:#fbfdff;
-}
-.footer { margin-top:14px; color:var(--muted); font-size:.88rem; }
-@media (max-width: 820px) {
-  body { padding:18px; }
-  .hero { padding:22px 20px; }
-  select { min-width:100%; }
-  .panel { padding:16px; }
-  table, thead, tbody, tr, th, td { display:block; width:100%; }
-  thead { display:none; }
-  tbody tr { border:1px solid var(--line); border-radius:16px; margin-bottom:12px; overflow:hidden; }
-  tbody td { border-bottom:1px solid #edf2f8; }
-  tbody td:last-child { border-bottom:none; }
-  tbody td::before {
-    content:attr(data-label); display:block; font-size:.74rem; text-transform:uppercase; color:var(--muted); margin-bottom:6px; letter-spacing:.05em;
-  }
-}
-</style>
+
+<link rel="stylesheet" href="styles/styles.css">
+
 </head>
 <body>
 <div class="container">
@@ -186,9 +89,11 @@ tbody tr:last-child td { border-bottom:none; }
         <p id="weekSubtitle"></p>
       </div>
       <div class="legend">
-        <span class="badge b-blue">Cursos enero</span>
-        <span class="badge b-green">Management / Research</span>
-        <span class="badge b-violet">Fundamentos / Métodos Cuantitativos</span>
+        <span class="badge b-blue">Probabilidad / Fundamentos</span>
+        <span class="badge b-green">Matemática</span>
+        <span class="badge b-amber">Microeconomía</span>
+        <span class="badge b-violet">Management / Métodos</span>
+        <span class="badge b-rose">Research Method</span>
         <span class="badge b-slate">Inducción / Evaluación</span>
       </div>
     </div>
@@ -197,267 +102,37 @@ tbody tr:last-child td { border-bottom:none; }
   </section>
 </div>
 
-<script>
-const schedule = [{"date": "2026-01-07", "course": "Probabilidad y Estadística", "professor": "Florencia Gabrielli", "time": "14:00 - 15:10 · 15:20 - 16:30", "location": "On line"}, {"date": "2026-01-08", "course": "Probabilidad y Estadística", "professor": "Florencia Gabrielli", "time": "14:00 - 15:10 · 15:20 - 16:30", "location": "On line"}, {"date": "2026-01-09", "course": "Probabilidad y Estadística", "professor": "Florencia Gabrielli", "time": "14:00 - 15:10", "location": "On line"}, {"date": "2026-01-14", "course": "Matemática", "professor": "Florencia Gabrielli", "time": "14:00 - 15:10 · 15:20 - 16:30", "location": "On line"}, {"date": "2026-01-15", "course": "Matemática", "professor": "Florencia Gabrielli", "time": "14:00 - 15:10 · 15:20 - 16:30", "location": "On line"}, {"date": "2026-01-16", "course": "Matemática", "professor": "Florencia Gabrielli", "time": "14:00 - 15:10", "location": "On line"}, {"date": "2026-01-19", "course": "Microeconomía", "professor": "Florencia Gabrielli", "time": "14:00 - 15:10 · 15:20 - 16:30", "location": "On line"}, {"date": "2026-01-20", "course": "Microeconomía", "professor": "Florencia Gabrielli", "time": "14:00 - 15:10 · 15:20 - 16:30", "location": "On line"}, {"date": "2026-01-21", "course": "Microeconomía", "professor": "Florencia Gabrielli", "time": "14:00 - 15:10 · 15:20 - 16:30", "location": "On line"}, {"date": "2026-01-23", "course": "Evaluación", "professor": "", "time": "", "location": ""}, {"date": "2026-01-26", "course": "Evaluación", "professor": "", "time": "", "location": ""}, {"date": "2026-03-02", "course": "Inducción SCL", "professor": "", "time": "9:30 - 16:00", "location": "JPOST 01 - SCL"}, {"date": "2026-03-05", "course": "Management - DEN3C113", "professor": "Luis Torres", "time": "8:30 - 11:00 · 11:10 - 13:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-03-06", "course": "Research Method - DEN3C114", "professor": "Carlos Poblete", "time": "08:00 - 10:40 · 10:50 - 13:00", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-03-09", "course": "Management - DEN3C113", "professor": "Luis Torres", "time": "8:30 - 11:00 · 11:10 - 13:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-03-13", "course": "Research Method - DEN3C114", "professor": "Carlos Poblete", "time": "08:00 - 10:40 · 10:50 - 13:00", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-03-16", "course": "Management - DEN3C113", "professor": "Luis Torres", "time": "8:30 - 11:00 · 11:10 - 13:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-03-20", "course": "Research Method - DEN3C114", "professor": "Carlos Poblete", "time": "08:00 - 10:40 · 10:50 - 13:00", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-03-23", "course": "Management - DEN3C113", "professor": "Luis Torres", "time": "8:30 - 12:20 · 12:30 - 13:40", "location": "SALA AI-533 / SALA AI-532"}, {"date": "2026-03-27", "course": "Research Method - DEN3C114", "professor": "Carlos Poblete", "time": "08:00 - 10:40 · 10:50 - 13:00", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-03-30", "course": "Management - DEN3C113", "professor": "Luis Torres", "time": "8:30 - 12:20 · 12:30 - 13:40", "location": "SALA AI-533 / SALA AI-532"}, {"date": "2026-04-02", "course": "Research Method - DEN3C114", "professor": "Carlos Poblete", "time": "08:00 - 10:40 · 10:50 - 13:00", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-04-06", "course": "Management - DEN3C113", "professor": "Luis Torres", "time": "8:30 - 12:20 · 12:30 - 13:40", "location": "SALA AI-533 / SALA AI-532"}, {"date": "2026-04-10", "course": "Research Method - DEN3C114", "professor": "Carlos Poblete", "time": "08:00 - 10:40 · 10:50 - 13:00", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-04-13", "course": "Management - DEN3C113", "professor": "Luis Torres", "time": "8:30 - 12:20 · 12:30 - 13:40", "location": "SALA AI-533 / SALA AI-532"}, {"date": "2026-04-17", "course": "Research Method - DEN3C114", "professor": "Carlos Poblete", "time": "08:00 - 10:40 · 10:50 - 13:00", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-04-20", "course": "Management - DEN3C113", "professor": "Luis Torres", "time": "8:30 - 11:00 · 11:10 - 13:40", "location": "SALA AI-533"}, {"date": "2026-04-24", "course": "Research Method - DEN3C114", "professor": "Carlos Poblete", "time": "08:00 - 10:40 · 10:50 - 13:00", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-05-05", "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112", "professor": "Nélyda Campos", "time": "08:30 - 9:40 · 12:30 - 15:00", "location": "SALA AI-SA404 / SALA AI-SA404"}, {"date": "2026-05-07", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "13:10 - 14:20 · 14:30 - 15:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-05-08", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "10:50 - 12:00 · 12:10 - 13:20", "location": "Clases on-line"}, {"date": "2026-05-12", "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112", "professor": "Nélyda Campos", "time": "08:30 - 11:00 · 11:10 - 13:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-05-14", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "13:10 - 14:20 · 14:30 - 15:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-05-15", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "10:50 - 12:00 · 12:10 - 13:20", "location": "Clases on-line"}, {"date": "2026-05-19", "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112", "professor": "Nélyda Campos", "time": "08:30 - 9:40 · 12:30 - 15:00", "location": "SALA AI-SA404 / SALA AI-SA404"}, {"date": "2026-05-26", "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112", "professor": "Nélyda Campos", "time": "08:30 - 11:00 · 11:10 - 13:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-05-28", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "13:10 - 14:20 · 14:30 - 15:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-05-29", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "10:50 - 12:00 · 12:10 - 13:20", "location": "Clases on-line"}, {"date": "2026-06-02", "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112", "professor": "Nélyda Campos", "time": "08:30 - 9:40 · 12:30 - 15:00", "location": "SALA AI-SA404 / SALA AI-SA404"}, {"date": "2026-06-04", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "13:10 - 14:20 · 14:30 - 15:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-06-05", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "10:50 - 12:00 · 12:10 - 13:20", "location": "Clases on-line"}, {"date": "2026-06-09", "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112", "professor": "Nélyda Campos", "time": "08:30 - 11:00 · 11:10 - 13:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-06-11", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "13:10 - 14:20 · 14:30 - 15:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-06-12", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "10:50 - 12:00 · 12:10 - 13:20", "location": "Clases on-line"}, {"date": "2026-06-16", "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112", "professor": "Nélyda Campos", "time": "08:30 - 11:00 · 11:10 - 13:40", "location": "SALA AI-SE012 Zócalo"}, {"date": "2026-06-18", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "13:10 - 14:20 · 14:30 - 15:40", "location": "Clases on-line"}, {"date": "2026-06-19", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "10:50 - 12:00 · 12:10 - 13:20", "location": "Clases on-line"}, {"date": "2026-06-23", "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112", "professor": "Nélyda Campos", "time": "08:30 - 9:40 · 12:30 - 15:00", "location": "SALA AI-SA404 / SALA AI-SA404"}, {"date": "2026-06-25", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "13:10 - 14:20 · 14:30 - 15:40", "location": "Clases on-line"}, {"date": "2026-06-26", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "10:50 - 12:00 · 12:10 - 13:20", "location": "Clases on-line"}, {"date": "2026-06-30", "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112", "professor": "Nélyda Campos", "time": "08:30 - 9:40 · 12:30 - 15:00", "location": "SALA AI-SA404 / SALA AI-SA404"}, {"date": "2026-07-02", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "13:10 - 14:20 · 14:30 - 15:40", "location": "Clases on-line"}, {"date": "2026-07-03", "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111", "professor": "Claudio Aqueveque", "time": "10:50 - 12:00 · 12:10 - 13:20", "location": "Clases on-line"}];
+<script src="scripts/script.js"></script>
 
-function mondayOf(dateStr) {
-  const d = new Date(dateStr + "T00:00:00");
-  const weekday = (d.getDay() + 6) % 7;
-  d.setDate(d.getDate() - weekday);
 
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
 
-function prettyDate(dateStr) {
-  const d = new Date(dateStr + "T00:00:00");
-  return d.toLocaleDateString("es-CL", { weekday:"long", day:"2-digit", month:"long", year:"numeric" });
-}
+<div id="den-chatbot">
 
-function courseClass(course) {
-  const c = course.toLowerCase();
-  if (c.includes("management") || c.includes("research")) return "b-green";
-  if (c.includes("fundamentos") || c.includes("métodos")) return "b-violet";
-  if (c.includes("probabilidad") || c.includes("matemática") || c.includes("microeconomía")) return "b-blue";
-  return "b-slate";
-}
+<div id="den-chat-header">
+HorarioBot
+</div>
 
-function renderSummary(rows) {
-  const classes = rows.filter(r => !r.course.toLowerCase().includes("evaluación") && !r.course.toLowerCase().includes("inducción")).length;
-  const courses = new Set(rows.map(r => r.course)).size;
-  const profs = new Set(rows.map(r => r.professor).filter(Boolean)).size;
-  document.getElementById("summary").innerHTML = `
-    <article class="sum-card"><div class="k">${rows.length}</div><div class="v">actividades en la semana</div></article>
-    <article class="sum-card"><div class="k">${classes}</div><div class="v">clases programadas</div></article>
-    <article class="sum-card"><div class="k">${courses}</div><div class="v">cursos / hitos distintos</div></article>
-    <article class="sum-card"><div class="k">${profs}</div><div class="v">profesores en la semana</div></article>
-  `;
-}
+<div id="den-chat-window">
 
-function setDefaultWeek(){
-  const today = new Date();
-  const weekday = (today.getDay()+6)%7;
-  today.setDate(today.getDate()-weekday);
+<div class="den-bot">
+¿Qué quieres saber?
+</div>
 
-  const year = today.getFullYear();
-  const month = String(today.getMonth()+1).padStart(2,"0");
-  const day = String(today.getDate()).padStart(2,"0");
-  const monday = `${year}-${month}-${day}`;
+<div class="den-buttons">
 
-  const selector = document.getElementById("weekSelector");
-  for(const option of selector.options){
-    if(option.value === monday){
-      selector.value = monday;
-      return;
-    }
-  }
-  selector.value = "all";
-}
+<button onclick="nextClassToday()">Clases de hoy</button>
 
-function updateFilters(){
-  const weekStart = document.getElementById("weekSelector").value;
-  const profSelector = document.getElementById("profSelector");
-  const courseSelector = document.getElementById("courseSelector");
+<button onclick="nextClassWeek()">Clases esta semana</button>
 
-  const selectedProf = profSelector.value;
-  const selectedCourse = courseSelector.value;
+<button onclick="nextClassGlobal()">Próxima clase</button>
 
-  let base = schedule;
-  if(weekStart !== "all"){
-    base = base.filter(r => mondayOf(r.date) === weekStart);
-  }
+<button onclick="coursesByProfessor()">Cursos por profesor</button>
 
-  let professorOptionsBase = base;
-  if(selectedCourse !== "all"){
-    professorOptionsBase = professorOptionsBase.filter(r => r.course === selectedCourse);
-  }
+</div>
 
-  let courseOptionsBase = base;
-  if(selectedProf !== "all"){
-    if(selectedProf === "sin_profesor"){
-      courseOptionsBase = courseOptionsBase.filter(r => !r.professor);
-    } else {
-      courseOptionsBase = courseOptionsBase.filter(r => r.professor === selectedProf);
-    }
-  }
+</div>
 
-  const professors = [...new Set(professorOptionsBase.map(r => r.professor).filter(Boolean))];
-  const hasNoProfessor = professorOptionsBase.some(r => !r.professor);
-  const courses = [...new Set(courseOptionsBase.map(r => r.course))];
+</div>
 
-  const validProfValues = ["all", ...professors, ...(hasNoProfessor ? ["sin_profesor"] : [])];
-  profSelector.innerHTML =
-    `<option value="all">Todos</option>` +
-    professors.map(p => `<option value="${p}">${p}</option>`).join("") +
-    (hasNoProfessor ? `<option value="sin_profesor">Sin profesor asignado</option>` : ``);
-
-  profSelector.value = validProfValues.includes(selectedProf) ? selectedProf : "all";
-
-  const validCourseValues = ["all", ...courses];
-  courseSelector.innerHTML =
-    `<option value="all">Todos</option>` +
-    courses.map(c => `<option value="${c}">${c}</option>`).join("");
-
-  courseSelector.value = validCourseValues.includes(selectedCourse) ? selectedCourse : "all";
-}
-
-function renderWeek() {
-  const weekStart = document.getElementById("weekSelector").value;
-  const profValue = document.getElementById("profSelector").value;
-  const courseValue = document.getElementById("courseSelector").value;
-
-  const rows = schedule
-    .filter(r => weekStart === "all" || mondayOf(r.date) === weekStart)
-    .filter(r => {
-      if (profValue === "all") return true;
-      if (profValue === "sin_profesor") return !r.professor;
-      return r.professor === profValue;
-    })
-    .filter(r => {
-      if (courseValue === "all") return true;
-      return r.course === courseValue;
-    })
-    .sort((a,b) => new Date(a.date) - new Date(b.date));
-
-  if(weekStart === "all"){
-    document.getElementById("weekTitle").textContent = "Programación completa";
-  }else{
-    const titleOpt = document.querySelector(`#weekSelector option[value="${weekStart}"]`);
-    document.getElementById("weekTitle").textContent = titleOpt.textContent;
-  }
-
-  let subtitle = rows.length
-    ? `Se encontraron ${rows.length} actividades registradas en la planificación para esta selección.`
-    : "No hay actividades registradas para esta selección.";
-
-  const subtitleParts = [];
-  if (profValue !== "all") {
-    subtitleParts.push(profValue === "sin_profesor" ? "sin profesor asignado" : `profesor: ${profValue}`);
-  }
-  if (courseValue !== "all") {
-    subtitleParts.push(`curso: ${courseValue}`);
-  }
-  if (subtitleParts.length) {
-    subtitle += ` Filtros activos: ${subtitleParts.join(" · ")}.`;
-  }
-
-  document.getElementById("weekSubtitle").textContent = subtitle;
-
-  renderSummary(rows);
-
-  const wrap = document.getElementById("tableWrap");
-  if (!rows.length) {
-    wrap.innerHTML = `<div class="empty">No hay actividades cargadas para la combinación de filtros seleccionada.</div>`;
-    return;
-  }
-
-  wrap.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Curso / actividad</th>
-          <th>Profesor</th>
-          <th>Horario</th>
-          <th>Sala / modalidad</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${
-          rows.map(r => `
-            <tr>
-              <td data-label="Fecha">
-                <div class="datebox">
-                  <div class="day">${prettyDate(r.date).split(",")[0]}</div>
-                  <div class="date">${prettyDate(r.date).replace(/^[^,]+,\s*/, "")}</div>
-                </div>
-              </td>
-              <td data-label="Curso / actividad">
-                <span class="course badge ${courseClass(r.course)}">${r.course}</span>
-              </td>
-              <td data-label="Profesor"><div class="meta">${r.professor || "-"}</div></td>
-              <td data-label="Horario"><div class="meta">${r.time || "-"}</div></td>
-              <td data-label="Sala / modalidad"><div class="meta">${r.location || "-"}</div></td>
-            </tr>
-          `).join("")
-        }
-      </tbody>
-    </table>
-  `;
-}
-
-function formatICSDate(dateStr, timeStr, isEnd=false){
-  if(!timeStr) return null;
-
-  const firstBlock = timeStr.split("·")[0].trim();
-  const parts = firstBlock.split("-");
-
-  let time = isEnd ? parts[1].trim() : parts[0].trim();
-  const [h,m] = time.split(":");
-
-  return dateStr.replace(/-/g,"") + "T" + h.padStart(2,"0") + m.padStart(2,"0") + "00";
-}
-
-function generateICS(){
-  let ics = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//DEN UDD//Horario 2026//ES
-CALSCALE:GREGORIAN
-`;
-
-  schedule.forEach((ev,i)=>{
-    const start = formatICSDate(ev.date,ev.time,false);
-    const end = formatICSDate(ev.date,ev.time,true);
-
-    if(!start || !end) return;
-
-    ics += `
-BEGIN:VEVENT
-UID:den-${i}@udd.cl
-DTSTAMP:${start}
-DTSTART:${start}
-DTEND:${end}
-SUMMARY:${ev.course}
-DESCRIPTION:Profesor ${ev.professor || "TBA"} - Doctorado Economía y Negocios UDD
-LOCATION:${ev.location || ""}
-END:VEVENT
-`;
-  });
-
-  ics += `
-END:VCALENDAR`;
-
-  const blob = new Blob([ics],{type:"text/calendar"});
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "den_horario_2026.ics";
-  a.click();
-
-  URL.revokeObjectURL(url);
-}
-
-document.getElementById("weekSelector").addEventListener("change", () => {
-  updateFilters();
-  renderWeek();
-});
-document.getElementById("profSelector").addEventListener("change", () => {
-  updateFilters();
-  renderWeek();
-});
-document.getElementById("courseSelector").addEventListener("change", () => {
-  updateFilters();
-  renderWeek();
-});
-
-setDefaultWeek();
-updateFilters();
-renderWeek();
-
-document.getElementById("downloadICS").addEventListener("click",generateICS);
-</script>
 </body>
 </html>

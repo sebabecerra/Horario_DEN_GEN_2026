@@ -1,0 +1,382 @@
+[
+{
+  "date": "2026-01-07",
+  "course": "Probabilidad y Estadística",
+  "professor": "Florencia Gabrielli",
+  "time": "14:00 - 15:10 · 15:20 - 16:30",
+  "location": "On line"
+},
+{
+  "date": "2026-01-08",
+  "course": "Probabilidad y Estadística",
+  "professor": "Florencia Gabrielli",
+  "time": "14:00 - 15:10 · 15:20 - 16:30",
+  "location": "On line"
+},
+{
+  "date": "2026-01-09",
+  "course": "Probabilidad y Estadística",
+  "professor": "Florencia Gabrielli",
+  "time": "14:00 - 15:10",
+  "location": "On line"
+},
+
+{
+  "date": "2026-01-14",
+  "course": "Matemática",
+  "professor": "Florencia Gabrielli",
+  "time": "14:00 - 15:10 · 15:20 - 16:30",
+  "location": "On line"
+},
+{
+  "date": "2026-01-15",
+  "course": "Matemática",
+  "professor": "Florencia Gabrielli",
+  "time": "14:00 - 15:10 · 15:20 - 16:30",
+  "location": "On line"
+},
+{
+  "date": "2026-01-16",
+  "course": "Matemática",
+  "professor": "Florencia Gabrielli",
+  "time": "14:00 - 15:10",
+  "location": "On line"
+},
+
+{
+  "date": "2026-01-19",
+  "course": "Microeconomía",
+  "professor": "Florencia Gabrielli",
+  "time": "14:00 - 15:10 · 15:20 - 16:30",
+  "location": "On line"
+},
+{
+  "date": "2026-01-20",
+  "course": "Microeconomía",
+  "professor": "Florencia Gabrielli",
+  "time": "14:00 - 15:10 · 15:20 - 16:30",
+  "location": "On line"
+},
+{
+  "date": "2026-01-21",
+  "course": "Microeconomía",
+  "professor": "Florencia Gabrielli",
+  "time": "14:00 - 15:10 · 15:20 - 16:30",
+  "location": "On line"
+},
+
+{
+  "date": "2026-01-23",
+  "course": "Evaluación",
+  "professor": "",
+  "time": "",
+  "location": ""
+},
+{
+  "date": "2026-01-26",
+  "course": "Evaluación",
+  "professor": "",
+  "time": "",
+  "location": ""
+},
+
+{
+  "date": "2026-03-02",
+  "course": "Inducción SCL",
+  "professor": "",
+  "time": "9:30 - 16:00",
+  "location": "JPOST 01 - SCL"
+},
+
+{
+  "date": "2026-03-05",
+  "course": "Management - DEN3C113",
+  "professor": "Luis Torres",
+  "time": "8:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-03-09",
+  "course": "Management - DEN3C113",
+  "professor": "Luis Torres",
+  "time": "8:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-03-16",
+  "course": "Management - DEN3C113",
+  "professor": "Luis Torres",
+  "time": "8:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-03-23",
+  "course": "Management - DEN3C113",
+  "professor": "Luis Torres",
+  "time": "8:30 - 12:20 · 12:30 - 13:40",
+  "location": "SALA AI-533 / SALA AI-532"
+},
+{
+  "date": "2026-03-30",
+  "course": "Management - DEN3C113",
+  "professor": "Luis Torres",
+  "time": "8:30 - 12:20 · 12:30 - 13:40",
+  "location": "SALA AI-533 / SALA AI-532"
+},
+{
+  "date": "2026-04-06",
+  "course": "Management - DEN3C113",
+  "professor": "Luis Torres",
+  "time": "8:30 - 12:20 · 12:30 - 13:40",
+  "location": "SALA AI-533 / SALA AI-532"
+},
+{
+  "date": "2026-04-13",
+  "course": "Management - DEN3C113",
+  "professor": "Luis Torres",
+  "time": "8:30 - 12:20 · 12:30 - 13:40",
+  "location": "SALA AI-533 / SALA AI-532"
+},
+{
+  "date": "2026-04-20",
+  "course": "Management - DEN3C113",
+  "professor": "Luis Torres",
+  "time": "8:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-533"
+},
+
+{
+  "date": "2026-03-06",
+  "course": "Research Method - DEN3C114",
+  "professor": "Carlos Poblete",
+  "time": "08:00 - 10:40 · 10:50 - 13:00",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-03-13",
+  "course": "Research Method - DEN3C114",
+  "professor": "Carlos Poblete",
+  "time": "08:00 - 10:40 · 10:50 - 13:00",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-03-20",
+  "course": "Research Method - DEN3C114",
+  "professor": "Carlos Poblete",
+  "time": "08:00 - 10:40 · 10:50 - 13:00",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-03-27",
+  "course": "Research Method - DEN3C114",
+  "professor": "Carlos Poblete",
+  "time": "08:00 - 10:40 · 10:50 - 13:00",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-04-02",
+  "course": "Research Method - DEN3C114",
+  "professor": "Carlos Poblete",
+  "time": "08:00 - 10:40 · 10:50 - 13:00",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-04-10",
+  "course": "Research Method - DEN3C114",
+  "professor": "Carlos Poblete",
+  "time": "08:00 - 10:40 · 10:50 - 13:00",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-04-17",
+  "course": "Research Method - DEN3C114",
+  "professor": "Carlos Poblete",
+  "time": "08:00 - 10:40 · 10:50 - 13:00",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-04-24",
+  "course": "Research Method - DEN3C114",
+  "professor": "Carlos Poblete",
+  "time": "08:00 - 10:40 · 10:50 - 13:00",
+  "location": "SALA AI-SE012 Zócalo"
+},
+
+{
+  "date": "2026-05-05",
+  "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
+  "professor": "Nélyda Campos",
+  "time": "08:30 - 9:40 · 12:30 - 15:00",
+  "location": "SALA AI-SA404 / SALA AI-SA404"
+},
+{
+  "date": "2026-05-12",
+  "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
+  "professor": "Nélyda Campos",
+  "time": "08:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-05-19",
+  "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
+  "professor": "Nélyda Campos",
+  "time": "08:30 - 9:40 · 12:30 - 15:00",
+  "location": "SALA AI-SA404 / SALA AI-SA404"
+},
+{
+  "date": "2026-05-26",
+  "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
+  "professor": "Nélyda Campos",
+  "time": "08:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-06-02",
+  "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
+  "professor": "Nélyda Campos",
+  "time": "08:30 - 9:40 · 12:30 - 15:00",
+  "location": "SALA AI-SA404 / SALA AI-SA404"
+},
+{
+  "date": "2026-06-09",
+  "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
+  "professor": "Nélyda Campos",
+  "time": "08:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-06-16",
+  "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
+  "professor": "Nélyda Campos",
+  "time": "08:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-06-23",
+  "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
+  "professor": "Nélyda Campos",
+  "time": "08:30 - 9:40 · 12:30 - 15:00",
+  "location": "SALA AI-SA404 / SALA AI-SA404"
+},
+{
+  "date": "2026-06-30",
+  "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
+  "professor": "Nélyda Campos",
+  "time": "08:30 - 9:40 · 12:30 - 15:00",
+  "location": "SALA AI-SA404 / SALA AI-SA404"
+},
+
+{
+  "date": "2026-05-07",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-05-08",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "10:50 - 12:00 · 12:10 - 13:20",
+  "location": "Clases on-line"
+},
+{
+  "date": "2026-05-14",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-05-15",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "10:50 - 12:00 · 12:10 - 13:20",
+  "location": "Clases on-line"
+},
+
+{
+  "date": "2026-05-28",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-05-29",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "10:50 - 12:00 · 12:10 - 13:20",
+  "location": "Clases on-line"
+},
+{
+  "date": "2026-06-04",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-06-05",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "10:50 - 12:00 · 12:10 - 13:20",
+  "location": "Clases on-line"
+},
+{
+  "date": "2026-06-11",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "location": "SALA AI-SE012 Zócalo"
+},
+{
+  "date": "2026-06-12",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "10:50 - 12:00 · 12:10 - 13:20",
+  "location": "Clases on-line"
+},
+{
+  "date": "2026-06-18",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "location": "Clases on-line"
+},
+{
+  "date": "2026-06-19",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "10:50 - 12:00 · 12:10 - 13:20",
+  "location": "Clases on-line"
+},
+{
+  "date": "2026-06-25",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "location": "Clases on-line"
+},
+{
+  "date": "2026-06-26",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "10:50 - 12:00 · 12:10 - 13:20",
+  "location": "Clases on-line"
+},
+{
+  "date": "2026-07-02",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "location": "Clases on-line"
+},
+{
+  "date": "2026-07-03",
+  "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
+  "professor": "Claudio Aqueveque",
+  "time": "10:50 - 12:00 · 12:10 - 13:20",
+  "location": "Clases on-line"
+}
+]
