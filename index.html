@@ -213,13 +213,21 @@ function renderSummary(rows) {
   `;
 }
 
+
 function setDefaultWeek(){
 
 const today = new Date()
+
+// calcular lunes de la semana actual
 const weekday = (today.getDay()+6)%7
 today.setDate(today.getDate()-weekday)
 
-const monday = today.toISOString().slice(0,10)
+// formatear YYYY-MM-DD sin usar UTC
+const year = today.getFullYear()
+const month = String(today.getMonth()+1).padStart(2,"0")
+const day = String(today.getDate()).padStart(2,"0")
+
+const monday = `${year}-${month}-${day}`
 
 const selector = document.getElementById("weekSelector")
 
@@ -230,11 +238,34 @@ return
 }
 }
 
+// si no encuentra semana → mostrar todo
 selector.value = "all"
 
 }
 
+function updateFilters(){
 
+const weekStart = document.getElementById("weekSelector").value
+
+let filtered = schedule
+
+if(weekStart !== "all"){
+filtered = filtered.filter(r => mondayOf(r.date) === weekStart)
+}
+
+const profSelector = document.getElementById("profSelector")
+const courseSelector = document.getElementById("courseSelector")
+
+const professors = [...new Set(filtered.map(r => r.professor).filter(Boolean))]
+const courses = [...new Set(filtered.map(r => r.course))]
+
+profSelector.innerHTML = `<option value="all">Todos</option>` +
+professors.map(p => `<option value="${p}">${p}</option>`).join("")
+
+courseSelector.innerHTML = `<option value="all">Todos</option>` +
+courses.map(c => `<option value="${c}">${c}</option>`).join("")
+
+}
 
 function renderWeek() {
   const weekStart = document.getElementById("weekSelector").value;
@@ -320,11 +351,15 @@ function renderWeek() {
   `;
 }
 
-document.getElementById("weekSelector").addEventListener("change", renderWeek);
+document.getElementById("weekSelector").addEventListener("change", () => {
+updateFilters()
+renderWeek()
+})
 document.getElementById("profSelector").addEventListener("change", renderWeek);
 document.getElementById("courseSelector").addEventListener("change", renderWeek);
 
 setDefaultWeek();
+updateFilters();
 renderWeek();
 </script>
 </body>
