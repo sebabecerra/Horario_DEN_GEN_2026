@@ -36,6 +36,18 @@ select {
   width:100%; max-width:100%; padding:12px 14px; border-radius:12px; border:none; font-size:0.98rem;
   color:var(--text); background:#fff;
 }
+.calendar-btn{
+  width:100%;
+  height:48px;
+  padding:0 18px;
+  border-radius:12px;
+  border:none;
+  background:#ffffff;
+  color:#17365f;
+  font-weight:700;
+  cursor:pointer;
+  font-size:.95rem;
+}
 .summary {
   margin:24px 0 18px; display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px;
 }
@@ -155,6 +167,13 @@ tbody tr:last-child td { border-bottom:none; }
           <option value="Evaluación">Evaluación</option>
         </select>
       </div>
+
+      <div class="control">
+        <label>&nbsp;</label>
+        <button id="downloadICS" class="calendar-btn">
+          📅 Descargar calendario completo (.ics)
+        </button>
+      </div>
     </div>
   </section>
 
@@ -185,7 +204,11 @@ function mondayOf(dateStr) {
   const d = new Date(dateStr + "T00:00:00");
   const weekday = (d.getDay() + 6) % 7;
   d.setDate(d.getDate() - weekday);
-  return d.toISOString().slice(0,10);
+
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function prettyDate(dateStr) {
@@ -213,58 +236,71 @@ function renderSummary(rows) {
   `;
 }
 
-
 function setDefaultWeek(){
+  const today = new Date();
+  const weekday = (today.getDay()+6)%7;
+  today.setDate(today.getDate()-weekday);
 
-const today = new Date()
+  const year = today.getFullYear();
+  const month = String(today.getMonth()+1).padStart(2,"0");
+  const day = String(today.getDate()).padStart(2,"0");
+  const monday = `${year}-${month}-${day}`;
 
-// calcular lunes de la semana actual
-const weekday = (today.getDay()+6)%7
-today.setDate(today.getDate()-weekday)
-
-// formatear YYYY-MM-DD sin usar UTC
-const year = today.getFullYear()
-const month = String(today.getMonth()+1).padStart(2,"0")
-const day = String(today.getDate()).padStart(2,"0")
-
-const monday = `${year}-${month}-${day}`
-
-const selector = document.getElementById("weekSelector")
-
-for(const option of selector.options){
-if(option.value === monday){
-selector.value = monday
-return
-}
-}
-
-// si no encuentra semana → mostrar todo
-selector.value = "all"
-
+  const selector = document.getElementById("weekSelector");
+  for(const option of selector.options){
+    if(option.value === monday){
+      selector.value = monday;
+      return;
+    }
+  }
+  selector.value = "all";
 }
 
 function updateFilters(){
+  const weekStart = document.getElementById("weekSelector").value;
+  const profSelector = document.getElementById("profSelector");
+  const courseSelector = document.getElementById("courseSelector");
 
-const weekStart = document.getElementById("weekSelector").value
+  const selectedProf = profSelector.value;
+  const selectedCourse = courseSelector.value;
 
-let filtered = schedule
+  let base = schedule;
+  if(weekStart !== "all"){
+    base = base.filter(r => mondayOf(r.date) === weekStart);
+  }
 
-if(weekStart !== "all"){
-filtered = filtered.filter(r => mondayOf(r.date) === weekStart)
-}
+  let professorOptionsBase = base;
+  if(selectedCourse !== "all"){
+    professorOptionsBase = professorOptionsBase.filter(r => r.course === selectedCourse);
+  }
 
-const profSelector = document.getElementById("profSelector")
-const courseSelector = document.getElementById("courseSelector")
+  let courseOptionsBase = base;
+  if(selectedProf !== "all"){
+    if(selectedProf === "sin_profesor"){
+      courseOptionsBase = courseOptionsBase.filter(r => !r.professor);
+    } else {
+      courseOptionsBase = courseOptionsBase.filter(r => r.professor === selectedProf);
+    }
+  }
 
-const professors = [...new Set(filtered.map(r => r.professor).filter(Boolean))]
-const courses = [...new Set(filtered.map(r => r.course))]
+  const professors = [...new Set(professorOptionsBase.map(r => r.professor).filter(Boolean))];
+  const hasNoProfessor = professorOptionsBase.some(r => !r.professor);
+  const courses = [...new Set(courseOptionsBase.map(r => r.course))];
 
-profSelector.innerHTML = `<option value="all">Todos</option>` +
-professors.map(p => `<option value="${p}">${p}</option>`).join("")
+  const validProfValues = ["all", ...professors, ...(hasNoProfessor ? ["sin_profesor"] : [])];
+  profSelector.innerHTML =
+    `<option value="all">Todos</option>` +
+    professors.map(p => `<option value="${p}">${p}</option>`).join("") +
+    (hasNoProfessor ? `<option value="sin_profesor">Sin profesor asignado</option>` : ``);
 
-courseSelector.innerHTML = `<option value="all">Todos</option>` +
-courses.map(c => `<option value="${c}">${c}</option>`).join("")
+  profSelector.value = validProfValues.includes(selectedProf) ? selectedProf : "all";
 
+  const validCourseValues = ["all", ...courses];
+  courseSelector.innerHTML =
+    `<option value="all">Todos</option>` +
+    courses.map(c => `<option value="${c}">${c}</option>`).join("");
+
+  courseSelector.value = validCourseValues.includes(selectedCourse) ? selectedCourse : "all";
 }
 
 function renderWeek() {
@@ -283,14 +319,15 @@ function renderWeek() {
       if (courseValue === "all") return true;
       return r.course === courseValue;
     })
-    .sort((a,b) => new Date(a.date) - new Date(b.date))
+    .sort((a,b) => new Date(a.date) - new Date(b.date));
 
-    if(weekStart === "all"){
-      document.getElementById("weekTitle").textContent = "Programación completa";
-    }else{
-      const titleOpt = document.querySelector(`#weekSelector option[value="${weekStart}"]`);
-      document.getElementById("weekTitle").textContent = titleOpt.textContent;
-    }
+  if(weekStart === "all"){
+    document.getElementById("weekTitle").textContent = "Programación completa";
+  }else{
+    const titleOpt = document.querySelector(`#weekSelector option[value="${weekStart}"]`);
+    document.getElementById("weekTitle").textContent = titleOpt.textContent;
+  }
+
   let subtitle = rows.length
     ? `Se encontraron ${rows.length} actividades registradas en la planificación para esta selección.`
     : "No hay actividades registradas para esta selección.";
@@ -351,16 +388,76 @@ function renderWeek() {
   `;
 }
 
+function formatICSDate(dateStr, timeStr, isEnd=false){
+  if(!timeStr) return null;
+
+  const firstBlock = timeStr.split("·")[0].trim();
+  const parts = firstBlock.split("-");
+
+  let time = isEnd ? parts[1].trim() : parts[0].trim();
+  const [h,m] = time.split(":");
+
+  return dateStr.replace(/-/g,"") + "T" + h.padStart(2,"0") + m.padStart(2,"0") + "00";
+}
+
+function generateICS(){
+  let ics = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//DEN UDD//Horario 2026//ES
+CALSCALE:GREGORIAN
+`;
+
+  schedule.forEach((ev,i)=>{
+    const start = formatICSDate(ev.date,ev.time,false);
+    const end = formatICSDate(ev.date,ev.time,true);
+
+    if(!start || !end) return;
+
+    ics += `
+BEGIN:VEVENT
+UID:den-${i}@udd.cl
+DTSTAMP:${start}
+DTSTART:${start}
+DTEND:${end}
+SUMMARY:${ev.course}
+DESCRIPTION:Profesor ${ev.professor || "TBA"} - Doctorado Economía y Negocios UDD
+LOCATION:${ev.location || ""}
+END:VEVENT
+`;
+  });
+
+  ics += `
+END:VCALENDAR`;
+
+  const blob = new Blob([ics],{type:"text/calendar"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "den_horario_2026.ics";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
 document.getElementById("weekSelector").addEventListener("change", () => {
-updateFilters()
-renderWeek()
-})
-document.getElementById("profSelector").addEventListener("change", renderWeek);
-document.getElementById("courseSelector").addEventListener("change", renderWeek);
+  updateFilters();
+  renderWeek();
+});
+document.getElementById("profSelector").addEventListener("change", () => {
+  updateFilters();
+  renderWeek();
+});
+document.getElementById("courseSelector").addEventListener("change", () => {
+  updateFilters();
+  renderWeek();
+});
 
 setDefaultWeek();
 updateFilters();
 renderWeek();
+
+document.getElementById("downloadICS").addEventListener("click",generateICS);
 </script>
 </body>
 </html>
