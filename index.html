@@ -1,116 +1,173 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Horario Académico DEN 2026</title>
+
+<title>Horario DEN 2026 | Doctorado Economía y Negocios UDD</title>
 
 <link rel="stylesheet" href="styles/styles.css">
+<script src="scripts/script.js" defer></script>
 
 </head>
+
 <body>
-<div class="container">
-  <section class="hero">
-    <h1>Horario Académico DEN 2026</h1>
-    <p>Programación revisada directamente desde el Excel de enero a julio de 2026. La vista permite seleccionar una semana y mostrar exactamente las actividades registradas, con curso, profesor, horario y sala/modalidad.</p>
-    <div class="controls">
-      <div class="control">
-        <label for="weekSelector">Semana</label>
-        <select id="weekSelector">
-          <option value="all">Todas las semanas</option>
-          <option value="2026-01-05">Semana 5-9 Enero 2026</option>
-          <option value="2026-01-12">Semana 12-16 Enero 2026</option>
-          <option value="2026-01-19">Semana 19-23 Enero 2026</option>
-          <option value="2026-01-26">Semana 26-30 Enero 2026</option>
-          <option value="2026-03-02">Semana 2-6 Marzo 2026</option>
-          <option value="2026-03-09">Semana 9-13 Marzo 2026</option>
-          <option value="2026-03-16">Semana 16-20 Marzo 2026</option>
-          <option value="2026-03-23">Semana 23-27 Marzo 2026</option>
-          <option value="2026-03-30">Semana 30 Marzo - 3 Abril 2026</option>
-          <option value="2026-04-06">Semana 6-10 Abril 2026</option>
-          <option value="2026-04-13">Semana 13-17 Abril 2026</option>
-          <option value="2026-04-20">Semana 20-24 Abril 2026</option>
-          <option value="2026-05-04">Semana 4-8 Mayo 2026</option>
-          <option value="2026-05-11">Semana 11-15 Mayo 2026</option>
-          <option value="2026-05-18">Semana 18-22 Mayo 2026</option>
-          <option value="2026-05-25">Semana 25-29 Mayo 2026</option>
-          <option value="2026-06-01">Semana 1-5 Junio 2026</option>
-          <option value="2026-06-08">Semana 8-12 Junio 2026</option>
-          <option value="2026-06-15">Semana 15-19 Junio 2026</option>
-          <option value="2026-06-22">Semana 22-26 Junio 2026</option>
-          <option value="2026-06-29">Semana 29 Junio - 3 Julio 2026</option>
-        </select>
-      </div>
 
-      <div class="control">
-        <label for="profSelector">Profesor</label>
-        <select id="profSelector">
-          <option value="all">Todos</option>
-          <option value="Florencia Gabrielli">Florencia Gabrielli</option>
-          <option value="Luis Torres">Luis Torres</option>
-          <option value="Carlos Poblete">Carlos Poblete</option>
-          <option value="Nélyda Campos">Nélyda Campos</option>
-          <option value="Claudio Aqueveque">Claudio Aqueveque</option>
-          <option value="sin_profesor">Sin profesor asignado</option>
-        </select>
-      </div>
+<main class="container">
 
-      <div class="control">
-        <label for="courseSelector">Curso</label>
-        <select id="courseSelector">
-          <option value="all">Todos</option>
-          <option value="Probabilidad y Estadística">Probabilidad y Estadística</option>
-          <option value="Matemática">Matemática</option>
-          <option value="Microeconomía">Microeconomía</option>
-          <option value="Management - DEN3C113">Management - DEN3C113</option>
-          <option value="Research Method - DEN3C114">Research Method - DEN3C114</option>
-          <option value="Fundamentos Económicos de Investigación en Negocios I - DEN3C112">Fundamentos Económicos de Investigación en Negocios I - DEN3C112</option>
-          <option value="Métodos Cuantitativos de la Investigación en Negocios - DEN3C111">Métodos Cuantitativos de la Investigación en Negocios - DEN3C111</option>
-          <option value="Inducción SCL">Inducción SCL</option>
-          <option value="Evaluación">Evaluación</option>
-        </select>
-      </div>
+<header class="hero">
 
-      <div class="control">
-        <label>&nbsp;</label>
-        <button id="downloadICS" class="calendar-btn">
-          📅 Descargar calendario completo (.ics)
-        </button>
-      </div>
-    </div>
-  </section>
+<h1>Horario Académico DEN 2026</h1>
 
-  <section class="summary" id="summary"></section>
+<p>
+Programación académica del Doctorado en Economía y Negocios (DEN).
+Permite visualizar clases, profesores, horarios y salas desde enero a julio de 2026.
+</p>
 
-  <section class="panel">
-    <div class="panel-head">
-      <div>
-        <h2 id="weekTitle">Semana</h2>
-        <p id="weekSubtitle"></p>
-      </div>
-      <div class="legend">
-        <span class="badge b-blue">Probabilidad / Fundamentos</span>
-        <span class="badge b-green">Matemática</span>
-        <span class="badge b-amber">Microeconomía</span>
-        <span class="badge b-violet">Management / Métodos</span>
-        <span class="badge b-rose">Research Method</span>
-        <span class="badge b-slate">Inducción / Evaluación</span>
-      </div>
-    </div>
-    <div id="tableWrap"></div>
-    <div class="footer">Incluye también inducción y evaluaciones cuando aparecen explícitamente en la planificación.</div>
-  </section>
+<div class="controls">
+
+<div class="control">
+<label for="weekSelector">Semana</label>
+
+<select id="weekSelector">
+
+<option value="all">Todas las semanas</option>
+
+<option value="2026-01-05">Semana 5–9 Enero 2026</option>
+<option value="2026-01-12">Semana 12–16 Enero 2026</option>
+<option value="2026-01-19">Semana 19–23 Enero 2026</option>
+<option value="2026-01-26">Semana 26–30 Enero 2026</option>
+
+<option value="2026-03-02">Semana 2–6 Marzo 2026</option>
+<option value="2026-03-09">Semana 9–13 Marzo 2026</option>
+<option value="2026-03-16">Semana 16–20 Marzo 2026</option>
+<option value="2026-03-23">Semana 23–27 Marzo 2026</option>
+<option value="2026-03-30">Semana 30 Marzo – 3 Abril 2026</option>
+
+<option value="2026-04-06">Semana 6–10 Abril 2026</option>
+<option value="2026-04-13">Semana 13–17 Abril 2026</option>
+<option value="2026-04-20">Semana 20–24 Abril 2026</option>
+
+<option value="2026-05-04">Semana 4–8 Mayo 2026</option>
+<option value="2026-05-11">Semana 11–15 Mayo 2026</option>
+<option value="2026-05-18">Semana 18–22 Mayo 2026</option>
+<option value="2026-05-25">Semana 25–29 Mayo 2026</option>
+
+<option value="2026-06-01">Semana 1–5 Junio 2026</option>
+<option value="2026-06-08">Semana 8–12 Junio 2026</option>
+<option value="2026-06-15">Semana 15–19 Junio 2026</option>
+<option value="2026-06-22">Semana 22–26 Junio 2026</option>
+<option value="2026-06-29">Semana 29 Junio – 3 Julio 2026</option>
+
+</select>
+
 </div>
 
-<script src="scripts/script.js"></script>
+<div class="control">
 
+<label for="profSelector">Profesor</label>
 
+<select id="profSelector">
 
-<div id="den-chatbot">
+<option value="all">Todos</option>
 
-<div id="den-chat-header">
-HorarioBot
+<option value="Florencia Gabrielli">Florencia Gabrielli</option>
+<option value="Luis Torres">Luis Torres</option>
+<option value="Carlos Poblete">Carlos Poblete</option>
+<option value="Nélyda Campos">Nélyda Campos</option>
+<option value="Claudio Aqueveque">Claudio Aqueveque</option>
+
+<option value="sin_profesor">Sin profesor asignado</option>
+
+</select>
+
 </div>
+
+<div class="control">
+
+<label for="courseSelector">Curso</label>
+
+<select id="courseSelector">
+
+<option value="all">Todos</option>
+
+<option value="Probabilidad y Estadística">Probabilidad y Estadística</option>
+<option value="Matemática">Matemática</option>
+<option value="Microeconomía">Microeconomía</option>
+
+<option value="Management - DEN3C113">Management - DEN3C113</option>
+<option value="Research Method - DEN3C114">Research Method - DEN3C114</option>
+
+<option value="Fundamentos Económicos de Investigación en Negocios I - DEN3C112">
+Fundamentos Económicos de Investigación en Negocios I - DEN3C112
+</option>
+
+<option value="Métodos Cuantitativos de la Investigación en Negocios - DEN3C111">
+Métodos Cuantitativos de la Investigación en Negocios - DEN3C111
+</option>
+
+<option value="Inducción SCL">Inducción SCL</option>
+<option value="Evaluación">Evaluación</option>
+
+</select>
+
+</div>
+
+<div class="control">
+
+<label>&nbsp;</label>
+
+<button id="downloadICS" class="calendar-btn">
+📅 Descargar calendario (.ics)
+</button>
+
+</div>
+
+
+</div>
+
+</header>
+
+<section class="summary" id="summary"></section>
+
+<section class="panel">
+
+<header class="panel-head">
+
+<div>
+<h2 id="weekTitle">Semana</h2>
+<p id="weekSubtitle"></p>
+</div>
+
+<div class="legend" id="legend"></div>
+
+</header>
+
+<div id="tableWrap"></div>
+
+<footer class="footer">
+Incluye inducciones y evaluaciones cuando aparecen en la planificación académica.
+</footer>
+
+</section>
+
+</main>
+
+<!-- CHATBOT -->
+
+<div id="den-chatbot" class="minimized">
+
+<header id="den-chat-header">
+
+<span>HorarioBot</span>
+
+<button id="chat-toggle" aria-label="Minimizar chatbot">
++
+</button>
+
+</header>
 
 <div id="den-chat-window">
 
@@ -121,11 +178,8 @@ HorarioBot
 <div class="den-buttons">
 
 <button onclick="nextClassToday()">Clases de hoy</button>
-
 <button onclick="nextClassWeek()">Clases esta semana</button>
-
 <button onclick="nextClassGlobal()">Próxima clase</button>
-
 <button onclick="coursesByProfessor()">Cursos por profesor</button>
 
 </div>
