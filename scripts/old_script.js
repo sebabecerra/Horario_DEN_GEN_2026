@@ -1,8 +1,31 @@
 /* =====================================================
-   DEN Horario 2026 – script.js
-   ===================================================== */
+DEN Horario 2026 – script.js
+===================================================== */
 
 let schedule = []
+
+/* =========================
+GOOGLE SCHOLAR
+========================= */
+
+const scholarLinks = {
+
+"Luis Torres":
+"https://scholar.google.com/citations?user=QHzMa7MAAAAJ&hl=en",
+
+"Carlos Poblete":
+"https://scholar.google.com/citations?user=s0uM4qcAAAAJ&hl=es",
+
+"Nélyda Campos":
+"https://scholar.google.com/citations?user=Nh6N6mQAAAAJ&hl=es",
+
+"Florencia Gabrielli":
+"https://scholar.google.com/citations?user=TnxT694AAAAJ&hl=es",
+
+"Claudio Aqueveque":
+"https://scholar.google.com/citations?user=JLauNGgAAAAJ&hl=es"
+
+}
 
 /* =========================
 DOM
@@ -16,9 +39,6 @@ const summary = document.getElementById("summary")
 const tableWrap = document.getElementById("tableWrap")
 const legend = document.getElementById("legend")
 
-const weekTitle = document.getElementById("weekTitle")
-const weekSubtitle = document.getElementById("weekSubtitle")
-
 const downloadICS = document.getElementById("downloadICS")
 
 const denChatWindow = document.getElementById("den-chat-window")
@@ -26,8 +46,45 @@ const chatToggle = document.getElementById("chat-toggle")
 const chatbot = document.getElementById("den-chatbot")
 
 /* =========================
+LOAD DATA
+========================= */
+
+fetch("data/schedule.json")
+.then(r=>{
+if(!r.ok) throw new Error("No se pudo cargar schedule.json")
+return r.json()
+})
+.then(data=>{
+
+schedule = data
+
+schedule.sort((a,b)=>new Date(a.date)-new Date(b.date))
+
+setDefaultWeek()
+updateFilters()
+renderWeek()
+showMainMenu()
+
+})
+.catch(err=>{
+console.error(err)
+tableWrap.innerHTML =
+`<div class="empty">Error al cargar los datos del horario.</div>`
+})
+
+/* =========================
 UTILS
 ========================= */
+
+function formatLocalDate(date){
+
+const y = date.getFullYear()
+const m = String(date.getMonth()+1).padStart(2,"0")
+const d = String(date.getDate()).padStart(2,"0")
+
+return `${y}-${m}-${d}`
+
+}
 
 function mondayOf(dateStr){
 
@@ -35,7 +92,7 @@ const d = new Date(dateStr+"T00:00:00")
 const weekday = (d.getDay()+6)%7
 d.setDate(d.getDate()-weekday)
 
-return d.toISOString().slice(0,10)
+return formatLocalDate(d)
 
 }
 
@@ -52,8 +109,28 @@ year:"numeric"
 
 }
 
+function renderProfessor(name){
+
+if(!name) return "-"
+
+const scholar = scholarLinks[name]
+
+if(!scholar){
+return name
+}
+
+return `
+<span class="prof-name">${name}</span>
+<a href="${scholar}" target="_blank" class="scholar-link" title="Google Scholar">
+📚
+</a>
+`
+
+}
+
+
 /* =========================
-COURSE COLORS
+COURSE COLORS AUTO
 ========================= */
 
 const courseColorMap = {}
@@ -84,37 +161,6 @@ return courseColorMap[course]
 }
 
 /* =========================
-LOAD DATA
-========================= */
-
-fetch("data/schedule.json")
-.then(r=>{
-if(!r.ok) throw new Error("No se pudo cargar schedule.json")
-return r.json()
-})
-.then(data=>{
-
-schedule = data
-
-schedule.sort((a,b)=>new Date(a.date)-new Date(b.date))
-
-updateFilters()
-setDefaultWeek()
-updateFilters()
-renderWeek()
-
-if(typeof showMainMenu==="function"){
-showMainMenu()
-}
-
-})
-.catch(err=>{
-console.error(err)
-tableWrap.innerHTML =
-`<div class="empty">Error al cargar los datos del horario.</div>`
-})
-
-/* =========================
 DEFAULT WEEK
 ========================= */
 
@@ -124,7 +170,7 @@ const today = new Date()
 const weekday = (today.getDay()+6)%7
 today.setDate(today.getDate()-weekday)
 
-const monday = today.toISOString().slice(0,10)
+const monday = formatLocalDate(today)
 
 for(const option of weekSelector.options){
 
@@ -146,21 +192,17 @@ FILTERS
 function updateFilters(){
 
 const week = weekSelector.value
-let prof = profSelector.value || "all"
-let course = courseSelector.value || "all"
+let prof = profSelector.value
+let course = courseSelector.value
 
 let base = schedule
 
 if(week!=="all")
 base = base.filter(e=>mondayOf(e.date)===week)
 
-/* PROF BASE */
-
 let profBase = base
 if(course!=="all")
 profBase = profBase.filter(e=>e.course===course)
-
-/* COURSE BASE */
 
 let courseBase = base
 if(prof!=="all"){
@@ -189,17 +231,11 @@ courseSelector.innerHTML =
 `<option value="all">Todos</option>` +
 courses.map(c=>`<option value="${c}">${c}</option>`).join("")
 
-/* RESTORE SELECTION */
-
 if(profSelector.querySelector(`option[value="${prof}"]`))
 profSelector.value = prof
-else
-profSelector.value = "all"
 
 if(courseSelector.querySelector(`option[value="${course}"]`))
 courseSelector.value = course
-else
-courseSelector.value = "all"
 
 }
 
@@ -209,10 +245,10 @@ SUMMARY
 
 function renderSummary(rows){
 
-const classes = rows.filter(r=>{
-const c = r.course.toLowerCase()
-return !c.includes("evaluacion") && !c.includes("induccion")
-}).length
+const classes = rows.filter(r=>
+!r.course.toLowerCase().includes("evaluacion") &&
+!r.course.toLowerCase().includes("induccion")
+).length
 
 const courses = new Set(rows.map(r=>r.course)).size
 const profs = new Set(rows.map(r=>r.professor).filter(Boolean)).size
@@ -244,43 +280,6 @@ summary.innerHTML =
 }
 
 /* =========================
-LEGEND
-========================= */
-
-function renderLegend(rows=[]){
-
-const uniqueCourses = [...new Set(rows.map(e=>e.course))]
-
-legend.innerHTML = uniqueCourses
-.map(course=>`
-<span class="badge ${getCourseColor(course)} legend-course" data-course="${course}">
-${course}
-</span>
-`)
-.join("")
-
-document.querySelectorAll(".legend-course").forEach(badge=>{
-
-badge.addEventListener("click",()=>{
-
-const clickedCourse = badge.dataset.course
-
-if(courseSelector.value===clickedCourse){
-courseSelector.value="all"
-}else{
-courseSelector.value=clickedCourse
-}
-
-updateFilters()
-renderWeek()
-
-})
-
-})
-
-}
-
-/* =========================
 RENDER WEEK
 ========================= */
 
@@ -290,10 +289,13 @@ const week = weekSelector.value
 const prof = profSelector.value
 const course = courseSelector.value
 
+const weekTitle = document.getElementById("weekTitle")
+const weekSubtitle = document.getElementById("weekSubtitle")
+
 if(week==="all"){
 
 weekTitle.textContent="Programación completa"
-weekSubtitle.textContent="Todas las semanas del semestre"
+weekSubtitle.textContent="Todas las semanas"
 
 }else{
 
@@ -305,7 +307,7 @@ const start = monday.toLocaleDateString("es-CL",{day:"numeric",month:"long"})
 const end = friday.toLocaleDateString("es-CL",{day:"numeric",month:"long",year:"numeric"})
 
 weekTitle.textContent=`Semana ${start} – ${end}`
-weekSubtitle.textContent="Actividades registradas en la planificación"
+weekSubtitle.textContent="Actividades registradas"
 
 }
 
@@ -324,14 +326,14 @@ renderLegend(rows)
 
 if(!rows.length){
 
-tableWrap.innerHTML=
+tableWrap.innerHTML =
 `<div class="empty">No hay actividades.</div>`
 
 return
 
 }
 
-tableWrap.innerHTML=
+tableWrap.innerHTML =
 
 `
 <table>
@@ -363,8 +365,9 @@ ${rows.map(r=>`
 <span class="badge ${getCourseColor(r.course)}">${r.course}</span>
 </td>
 
-<td data-label="Profesor">${r.professor||"-"}</td>
-
+<td data-label="Profesor">
+${renderProfessor(r.professor)}
+</td>
 <td data-label="Horario">${r.time||"-"}</td>
 
 <td data-label="Sala">${r.location||"-"}</td>
@@ -380,28 +383,92 @@ ${rows.map(r=>`
 }
 
 /* =========================
-ICS GENERATOR
+LEGEND
 ========================= */
 
-function formatICSDate(date,time,isEnd=false){
+function renderLegend(rows){
 
-if(!time) return null
+const uniqueCourses = [...new Set(rows.map(e=>e.course))]
 
-const block=(time.split("·")[0]||time)
-const parts=block.split("-")
+legend.innerHTML = uniqueCourses
+.map(course => `
+<span class="badge ${getCourseColor(course)} legend-course" data-course="${course}">
+${course}
+</span>
+`)
+.join("")
 
-if(parts.length<2) return null
+document.querySelectorAll(".legend-course").forEach(badge=>{
 
-let t=isEnd?parts[1]:parts[0]
-t=t.trim()
+badge.addEventListener("click",()=>{
 
-const [h,m]=t.split(":")
+courseSelector.value = badge.dataset.course
 
-return date.replace(/-/g,"")+"T"+h+m+"00"
+const match = schedule.find(e=>e.course===badge.dataset.course)
+
+if(match && match.professor)
+profSelector.value = match.professor
+
+renderWeek()
+
+})
+
+})
 
 }
 
-function generateICS(){
+/* =========================
+PROF ↔ COURSE SYNC
+========================= */
+
+profSelector.addEventListener("change",()=>{
+
+const prof = profSelector.value
+
+if(prof!=="all" && prof!=="sin_profesor"){
+
+const match = schedule.find(e=>e.professor===prof)
+
+if(match)
+courseSelector.value = match.course
+
+}
+
+updateFilters()
+renderWeek()
+
+})
+
+courseSelector.addEventListener("change",()=>{
+
+const course = courseSelector.value
+
+if(course!=="all"){
+
+const match = schedule.find(e=>e.course===course)
+
+if(match)
+profSelector.value = match.professor || "all"
+
+}
+
+updateFilters()
+renderWeek()
+
+})
+
+weekSelector.addEventListener("change",()=>{
+
+updateFilters()
+renderWeek()
+
+})
+
+/* =========================
+ICS
+========================= */
+
+downloadICS.addEventListener("click",()=>{
 
 let ics=`BEGIN:VCALENDAR
 VERSION:2.0
@@ -410,10 +477,13 @@ PRODID:-//DEN//Horario 2026//ES
 
 schedule.forEach((ev,i)=>{
 
-const start=formatICSDate(ev.date,ev.time,false)
-const end=formatICSDate(ev.date,ev.time,true)
+if(!ev.time) return
 
-if(!start||!end) return
+const parts = ev.time.split("-")
+if(parts.length<2) return
+
+const start = ev.date.replace(/-/g,"")+"T"+parts[0].replace(":","")+"00"
+const end = ev.date.replace(/-/g,"")+"T"+parts[1].replace(":","")+"00"
 
 ics+=`
 
@@ -431,44 +501,21 @@ END:VEVENT
 
 ics+=`\nEND:VCALENDAR`
 
-const blob=new Blob([ics],{type:"text/calendar"})
-const url=URL.createObjectURL(blob)
+const blob = new Blob([ics],{type:"text/calendar"})
+const url = URL.createObjectURL(blob)
 
 const a=document.createElement("a")
 a.href=url
 a.download="den_horario_2026.ics"
 a.click()
 
-}
-
-/* =========================
-EVENTS
-========================= */
-
-weekSelector.addEventListener("change",()=>{
-updateFilters()
-renderWeek()
 })
-
-profSelector.addEventListener("change",()=>{
-updateFilters()
-renderWeek()
-})
-
-courseSelector.addEventListener("change",()=>{
-updateFilters()
-renderWeek()
-})
-
-downloadICS.addEventListener("click",generateICS)
 
 /* =========================
 CHATBOT
 ========================= */
 
 function showMainMenu(){
-
-if(!denChatWindow) return
 
 denChatWindow.innerHTML=`
 
@@ -484,7 +531,6 @@ denChatWindow.innerHTML=`
 <button onclick="coursesByProfessor()">Cursos por profesor</button>
 
 </div>
-
 `
 
 }
@@ -518,6 +564,61 @@ denChatWindow.innerHTML=html
 
 }
 
+function nextClassToday(){
+
+const today=new Date().toISOString().slice(0,10)
+const events=schedule.filter(e=>e.date===today)
+showAnswer(events)
+
+}
+
+function nextClassWeek(){
+
+const today=new Date()
+const weekday=(today.getDay()+6)%7
+today.setDate(today.getDate()-weekday)
+
+const monday=formatLocalDate(today)
+
+const events=schedule.filter(e=>mondayOf(e.date)===monday)
+showAnswer(events)
+
+}
+
+function nextClassGlobal(){
+
+const today=new Date().toISOString().slice(0,10)
+
+const future=schedule
+.filter(e=>e.date>=today)
+.sort((a,b)=>new Date(a.date)-new Date(b.date))
+
+if(!future.length) showAnswer([])
+else showAnswer([future[0]])
+
+}
+
+function coursesByProfessor(){
+
+const profs=[...new Set(schedule.map(e=>e.professor).filter(Boolean))]
+
+let html=`<button onclick="showMainMenu()">← Volver</button><br><br>`
+
+profs.forEach(p=>{
+html+=`<button onclick="showProfessorCourses('${p}')">${p}</button><br>`
+})
+
+denChatWindow.innerHTML=html
+
+}
+
+function showProfessorCourses(p){
+
+const events=schedule.filter(e=>e.professor===p)
+showAnswer(events)
+
+}
+
 /* =========================
 CHATBOT MINIMIZE
 ========================= */
@@ -532,5 +633,86 @@ chatToggle.textContent =
 chatbot.classList.contains("minimized") ? "+" : "−"
 
 })
+
+
+function showSection(section){
+
+document.getElementById("scheduleSection").style.display="none"
+document.getElementById("facultySection").style.display="none"
+document.getElementById("coursesSection").style.display="none"
+document.getElementById("researchSection").style.display="none"
+
+if(section==="schedule")
+document.getElementById("scheduleSection").style.display="block"
+
+if(section==="faculty")
+document.getElementById("facultySection").style.display="block"
+
+if(section==="courses")
+document.getElementById("coursesSection").style.display="block"
+
+if(section==="research")
+document.getElementById("researchSection").style.display="block"
+
+}
+
+
+function renderFaculty(){
+
+const professors = [...new Set(schedule.map(e=>e.professor).filter(Boolean))]
+
+facultyGrid.innerHTML = professors.map(p=>`
+
+<div class="faculty-card">
+
+<h3>${p}</h3>
+
+<a href="${scholarLinks[p]}" target="_blank">
+Google Scholar
+</a>
+
+</div>
+
+`).join("")
+
+}
+
+function renderCourses(){
+
+const courses = [...new Set(schedule.map(e=>e.course))]
+
+coursesGrid.innerHTML = courses.map(c=>`
+
+<div class="course-card">
+
+<h3>${c}</h3>
+
+<button onclick="selectCourse('${c}')">
+Ver horario
+</button>
+
+</div>
+
+`).join("")
+
+}
+function renderResearch(){
+
+researchArea.innerHTML = `
+
+<h2>Research Areas</h2>
+
+<ul>
+<li>Strategy</li>
+<li>Entrepreneurship</li>
+<li>Innovation</li>
+<li>Applied Microeconomics</li>
+<li>Business Analytics</li>
+</ul>
+
+`
+
+}
+
 
 }

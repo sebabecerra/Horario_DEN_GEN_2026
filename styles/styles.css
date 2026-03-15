@@ -426,4 +426,49 @@ transform:scale(1.05);
 outline:2px solid #1e3a8a;
 }
 
+.prof-name{
+margin-right:6px;
+}
+
+.scholar-link{
+text-decoration:none;
+font-size:14px;
+margin-left:4px;
+}
+
+.scholar-link:hover{
+opacity:0.7;
+}
+
+.den-navbar{
+
+display:flex;
+gap:10px;
+margin-bottom:20px;
+
+}
+
+.den-navbar button{
+
+background:#17365f;
+color:white;
+border:none;
+padding:10px 14px;
+border-radius:8px;
+cursor:pointer;
+
+}
+
+.faculty-card,
+.course-card{
+
+background:white;
+border-radius:12px;
+padding:16px;
+box-shadow:0 8px 20px rgba(0,0,0,.08);
+margin-bottom:12px;
+
+}
+
+
 }
