@@ -1,42 +1,43 @@
 # Horario DEN 2026
 
-Visualización web del **calendario académico del Doctorado en Economía y Negocios (DEN), Generación 2026**.
+Aplicación web para visualizar el calendario académico del **Doctorado en Economía y Negocios (DEN), generación 2026**.
 
-La página permite seleccionar una **semana entre enero y julio de 2026** y ver:
+## Qué hace
 
-- curso
-- profesor
-- horario
-- sala o modalidad (presencial / online)
+- Filtra actividades por semana, profesor, curso y búsqueda libre.
+- Muestra resumen ejecutivo de actividades visibles.
+- Permite navegar cursos y profesores desde un panel lateral.
+- Incluye un asistente de consultas rápidas.
+- Exporta las actividades filtradas a un archivo `.ics`.
 
-Incluye también **inducción y evaluaciones** cuando aparecen en la planificación.
+## Estructura real
 
----
-
-## Estructura
-
+```text
+Horario_DEN_GEN_2026/
+├── index.html
+├── data/
+│   └── schedule.json
+├── scripts/
+│   ├── schedule.js
+│   ├── portal.js
+│   ├── chatbot.js
+│   └── old_script.js
+└── styles/
+    └── styles.css
 ```
-den-horario-2026/
-├── horario_den.html
-├── Planificacion_DEN_2026.xlsx
-└── README.md
-```
 
----
-
-## Tecnologías
+## Stack
 
 - HTML
 - CSS
-- JavaScript
-
----
+- JavaScript vanilla
 
 ## Fuente de datos
 
 Planificación oficial del **Doctorado en Economía y Negocios (DEN)**  
-Periodo: **enero – julio 2026**
+Periodo visible: **enero a julio de 2026**
 
----
+## Notas
 
-**Autor:** Sebastián Becerra
+- `scripts/old_script.js` quedó como referencia histórica y no se usa en la app actual.
+- La app no requiere build step; basta con servir el directorio estático.

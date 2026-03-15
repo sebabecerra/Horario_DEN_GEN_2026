@@ -2,228 +2,209 @@
 DEN Chatbot – chatbot.js
 ===================================================== */
 
-/* =========================
-DOM
-========================= */
+(function(){
+let app = null
+let snapshot = null
 
-const denChatWindow = document.getElementById("den-chat-window")
-const chatToggle = document.getElementById("chat-toggle")
-const chatbot = document.getElementById("den-chatbot")
+const dom = {}
 
-/* =========================
-UTILS
-========================= */
+document.addEventListener("DOMContentLoaded", () => {
+  dom.window = document.getElementById("den-chat-window")
+  dom.toggle = document.getElementById("chat-toggle")
+  dom.chatbot = document.getElementById("den-chatbot")
 
-function chatbotDate(dateStr){
+  dom.toggle.addEventListener("click", toggleChat)
 
-const d = new Date(dateStr+"T00:00:00")
+  if(window.DENApp){
+    app = window.DENApp
+    app.subscribe(nextSnapshot => {
+      snapshot = nextSnapshot
+      if(!dom.window.dataset.view){
+        renderMenu()
+      }
+    })
+  }
 
-return d.toLocaleDateString("es-CL",{
-weekday:"long",
-day:"2-digit",
-month:"long"
+  renderMenu()
 })
 
+function toggleChat(){
+  const isMinimized = dom.chatbot.classList.toggle("minimized")
+  dom.toggle.textContent = isMinimized ? "+" : "−"
+  dom.toggle.setAttribute("aria-expanded", String(!isMinimized))
 }
 
-/* =========================
-MAIN MENU
-========================= */
+function renderMenu(){
+  dom.window.dataset.view = "menu"
+  dom.window.innerHTML = ""
 
-function showMainMenu(){
+  const intro = document.createElement("div")
+  intro.className = "chat-copy"
+  intro.textContent = "¿Qué quieres revisar?"
 
-if(!denChatWindow) return
+  const buttons = document.createElement("div")
+  buttons.className = "den-buttons"
 
-denChatWindow.innerHTML = `
+  ;[
+    { label: "Clases Semana Pasada", action: showClassesLastWeek },
+    { label: "Clases Proxima Semana", action: showClassesNextWeek },
+    { label: "Clases Esta Semana", action: showClassesThisWeek },
+    { label: "Cursos por profesor", action: showProfessors }
+  ].forEach(item => {
+    const button = document.createElement("button")
+    button.type = "button"
+    button.textContent = item.label
+    button.addEventListener("click", item.action)
+    buttons.appendChild(button)
+  })
 
-<div class="den-bot">
-¿Qué quieres saber?
-</div>
-
-<div class="den-buttons">
-
-<button onclick="nextClassToday()">
-Clases de hoy
-</button>
-
-<button onclick="nextClassWeek()">
-Clases esta semana
-</button>
-
-<button onclick="nextClassGlobal()">
-Próxima clase
-</button>
-
-<button onclick="coursesByProfessor()">
-Cursos por profesor
-</button>
-
-</div>
-
-`
-
+  dom.window.append(intro, buttons)
 }
 
-/* =========================
-SHOW ANSWER
-========================= */
+function showClassesThisWeek(){
+  if(!snapshot){
+    return
+  }
 
-function showAnswer(events){
-
-let html = `
-<button onclick="showMainMenu()">← Volver</button>
-<br><br>
-`
-
-if(!events || !events.length){
-
-html += "No encontré clases."
-denChatWindow.innerHTML = html
-return
-
+  const today = snapshot.helpers.formatLocalDate(new Date())
+  const monday = snapshot.helpers.mondayOf(today)
+  renderWeekEvents("Clases de esta semana", monday)
 }
 
-events.forEach(e=>{
+function showClassesLastWeek(){
+  if(!snapshot){
+    return
+  }
 
-html += `
-
-<b>${e.course}</b><br>
-Profesor: ${e.professor || "-"}<br>
-Fecha: ${chatbotDate(e.date)}<br>
-Horario: ${e.time || "-"}<br>
-Sala: ${e.location || "-"}<br><br>
-
-`
-
-})
-
-denChatWindow.innerHTML = html
-
+  const today = new Date()
+  today.setDate(today.getDate() - 7)
+  const monday = snapshot.helpers.mondayOf(snapshot.helpers.formatLocalDate(today))
+  renderWeekEvents("Clases de la semana pasada", monday)
 }
 
-/* =========================
-TODAY
-========================= */
+function showClassesNextWeek(){
+  if(!snapshot){
+    return
+  }
 
-function nextClassToday(){
-
-if(!schedule) return
-
-const today = new Date().toISOString().slice(0,10)
-
-const events = schedule.filter(e => e.date === today)
-
-showAnswer(events)
-
+  const today = new Date()
+  today.setDate(today.getDate() + 7)
+  const monday = snapshot.helpers.mondayOf(snapshot.helpers.formatLocalDate(today))
+  renderWeekEvents("Clases de la próxima semana", monday)
 }
 
-/* =========================
-THIS WEEK
-========================= */
-
-function nextClassWeek(){
-
-if(!schedule) return
-
-const today = new Date()
-
-const weekday = (today.getDay()+6)%7
-today.setDate(today.getDate()-weekday)
-
-const monday = today.toISOString().slice(0,10)
-
-const events = schedule.filter(e => mondayOf(e.date) === monday)
-
-showAnswer(events)
-
+function renderWeekEvents(title, monday){
+  const events = snapshot.schedule.filter(item =>
+    snapshot.helpers.mondayOf(item.date) === monday &&
+    isTeachingClass(item)
+  )
+  renderEvents(title, events)
 }
 
-/* =========================
-NEXT CLASS
-========================= */
-
-function nextClassGlobal(){
-
-if(!schedule) return
-
-const today = new Date().toISOString().slice(0,10)
-
-const future = schedule
-.filter(e => e.date >= today)
-.sort((a,b)=> new Date(a.date) - new Date(b.date))
-
-if(!future.length){
-
-showAnswer([])
-return
-
+function isTeachingClass(event){
+  const course = String(event.course || "").toLowerCase()
+  return !course.includes("inducci") && !course.includes("evaluaci")
 }
 
-showAnswer([future[0]])
+function showProfessors(){
+  if(!snapshot){
+    return
+  }
 
+  dom.window.dataset.view = "professors"
+  dom.window.innerHTML = ""
+  dom.window.appendChild(createBackButton())
+
+  const list = document.createElement("div")
+  list.className = "den-buttons"
+
+  const professors = [...new Set(snapshot.schedule.map(item => item.professor).filter(Boolean))]
+
+  professors.forEach(name => {
+    const button = document.createElement("button")
+    button.type = "button"
+    button.textContent = name
+    button.addEventListener("click", () => {
+      const events = snapshot.schedule.filter(item => item.professor === name)
+      renderEvents(name, events)
+    })
+    list.appendChild(button)
+  })
+
+  dom.window.appendChild(list)
 }
 
-/* =========================
-COURSES BY PROFESSOR
-========================= */
+function renderEvents(title, events){
+  dom.window.dataset.view = "results"
+  dom.window.innerHTML = ""
+  dom.window.appendChild(createBackButton())
 
-function coursesByProfessor(){
+  const heading = document.createElement("div")
+  heading.className = "chat-copy"
+  heading.textContent = title
+  dom.window.appendChild(heading)
 
-if(!schedule) return
+  if(!events.length){
+    const empty = document.createElement("p")
+    empty.className = "chat-empty"
+    empty.textContent = "No encontré actividades para esa consulta."
+    dom.window.appendChild(empty)
+    return
+  }
 
-const profs = [...new Set(schedule.map(e=>e.professor).filter(Boolean))]
+  const list = document.createElement("div")
+  list.className = "chat-results"
 
-let html = `
-<button onclick="showMainMenu()">← Volver</button>
-<br><br>
-`
+  events.forEach(event => {
+    const card = document.createElement("article")
+    card.className = "chat-card"
 
-profs.forEach(p=>{
+    const course = document.createElement("h3")
+    course.textContent = event.course
 
-html += `
-<button onclick="showProfessorCourses('${p}')">
-${p}
-</button>
-<br>
-`
+    const meta = document.createElement("p")
+    meta.className = "chat-meta"
+    meta.textContent = [
+      event.professor || "Sin profesor asignado",
+      formatChatDate(event.date),
+      event.time || "Horario por definir",
+      event.location || "Sala por definir"
+    ].join(" | ")
 
-})
+    const action = document.createElement("button")
+    action.type = "button"
+    action.className = "text-btn"
+    action.textContent = "Aplicar filtros"
+    action.addEventListener("click", () => {
+      app.setFilter("week", snapshot.helpers.mondayOf(event.date))
+      app.setFilter("course", event.course)
+      if(event.professor){
+        app.setFilter("professor", event.professor)
+      }
+    })
 
-denChatWindow.innerHTML = html
+    card.append(course, meta, action)
+    list.appendChild(card)
+  })
 
+  dom.window.appendChild(list)
 }
 
-function showProfessorCourses(prof){
-
-const events = schedule.filter(e => e.professor === prof)
-
-showAnswer(events)
-
+function createBackButton(){
+  const button = document.createElement("button")
+  button.type = "button"
+  button.className = "text-btn"
+  button.textContent = "← Volver"
+  button.addEventListener("click", renderMenu)
+  return button
 }
 
-/* =========================
-MINIMIZE
-========================= */
-
-if(chatToggle && chatbot){
-
-chatToggle.addEventListener("click",()=>{
-
-chatbot.classList.toggle("minimized")
-
-chatToggle.textContent =
-chatbot.classList.contains("minimized") ? "+" : "−"
-
-})
-
+function formatChatDate(dateStr){
+  const date = new Date(`${dateStr}T00:00:00`)
+  return date.toLocaleDateString("es-CL", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long"
+  })
 }
-
-/* =========================
-INIT
-========================= */
-
-document.addEventListener("DOMContentLoaded",()=>{
-
-showMainMenu()
-
-})
+})()

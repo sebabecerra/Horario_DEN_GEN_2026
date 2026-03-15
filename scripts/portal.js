@@ -2,146 +2,157 @@
 DEN Portal – portal.js
 ===================================================== */
 
-/* =========================
-DOM
-========================= */
+(function(){
+let app = null
 
-const facultyGrid = document.getElementById("facultyGrid")
-const coursesGrid = document.getElementById("coursesGrid")
+const dom = {}
 
-/* =========================
-FACULTY
-========================= */
+document.addEventListener("DOMContentLoaded", () => {
+  dom.facultyGrid = document.getElementById("facultyGrid")
+  dom.coursesGrid = document.getElementById("coursesGrid")
+  dom.showAllFaculty = document.getElementById("showAllFaculty")
+  dom.showAllCourses = document.getElementById("showAllCourses")
 
-function renderFaculty(){
+  dom.showAllFaculty.addEventListener("click", () => {
+    app?.setFilter("professor", "all")
+  })
+  dom.showAllCourses.addEventListener("click", () => {
+    app?.setFilter("course", "all")
+  })
 
-if(!facultyGrid || !schedule) return
+  if(window.DENApp){
+    app = window.DENApp
+    app.subscribe(snapshot => {
+      renderFaculty(snapshot)
+      renderCourses(snapshot)
+    })
+  }
+})
 
-const professors = [...new Set(
-schedule.map(e=>e.professor).filter(Boolean)
-)]
+function renderFaculty(snapshot = app?.getState()){
+  if(!snapshot || !dom.facultyGrid){
+    return
+  }
 
-facultyGrid.innerHTML = professors.map(p=>`
+  const selectedProfessor = snapshot.filters.professor
+  const professors = [...new Set(snapshot.schedule.map(item => item.professor).filter(Boolean))]
+  dom.facultyGrid.innerHTML = ""
 
-<div class="faculty-card">
+  professors.forEach(name => {
+    const items = snapshot.schedule.filter(item => item.professor === name)
+    const courses = new Set(items.map(item => item.course)).size
 
-<h3>${p}</h3>
+    const card = document.createElement("article")
+    card.className = "info-card"
 
-<div class="faculty-links">
+    const header = document.createElement("div")
+    header.className = "info-card-head"
 
-<a href="${scholarLinks[p] || "#"}" target="_blank">
-Google Scholar
-</a>
+    const title = document.createElement("h3")
+    title.textContent = name
 
-<button onclick="showProfessorCourses('${p}')">
-Ver cursos
-</button>
+    if(selectedProfessor === name){
+      const pill = document.createElement("span")
+      pill.className = "mini-pill"
+      pill.textContent = "Activo"
+      header.append(title, pill)
+    } else {
+      header.appendChild(title)
+    }
 
-</div>
+    const meta = document.createElement("p")
+    meta.className = "muted-copy"
+    meta.textContent = `${courses} cursos | ${items.length} actividades`
 
-</div>
+    const actions = document.createElement("div")
+    actions.className = "card-actions"
 
-`).join("")
+    const viewButton = document.createElement("button")
+    viewButton.type = "button"
+    viewButton.className = "text-btn"
+    viewButton.textContent = "Filtrar horario"
+    viewButton.addEventListener("click", () => {
+      app.setFilter("professor", name)
+    })
 
+    actions.appendChild(viewButton)
+
+    if(snapshot.scholarLinks[name]){
+      const scholarLink = document.createElement("a")
+      scholarLink.href = snapshot.scholarLinks[name]
+      scholarLink.target = "_blank"
+      scholarLink.rel = "noopener noreferrer"
+      scholarLink.className = "text-link"
+      scholarLink.textContent = "Google Scholar"
+      actions.appendChild(scholarLink)
+    }
+
+    card.append(header, meta, actions)
+    dom.facultyGrid.appendChild(card)
+  })
 }
 
+function renderCourses(snapshot = app?.getState()){
+  if(!snapshot || !dom.coursesGrid){
+    return
+  }
 
-/* =========================
-COURSES
-========================= */
+  const selectedProfessor = snapshot.filters.professor
+  const selectedCourse = snapshot.filters.course
 
-function renderCourses(){
+  let courses = [...new Set(snapshot.schedule.map(item => item.course))]
 
-if(!coursesGrid || !schedule) return
+  if(selectedProfessor !== "all" && selectedProfessor !== "sin_profesor"){
+    courses = [...new Set(
+      snapshot.schedule
+        .filter(item => item.professor === selectedProfessor)
+        .map(item => item.course)
+    )]
+  }
 
-const courses = [...new Set(
-schedule.map(e=>e.course)
-)]
+  dom.coursesGrid.innerHTML = ""
 
-coursesGrid.innerHTML = courses.map(c=>`
+  courses.forEach(course => {
+    const items = snapshot.schedule.filter(item => item.course === course)
+    const professors = [...new Set(items.map(item => item.professor).filter(Boolean))]
+    const card = document.createElement("article")
+    card.className = "info-card"
 
-<div class="course-card">
+    const header = document.createElement("div")
+    header.className = "info-card-head"
 
-<h3>${c}</h3>
+    const title = document.createElement("h3")
+    title.textContent = course
 
-<button onclick="selectCourse('${c}')">
-Ver horario
-</button>
+    if(selectedCourse === course){
+      const pill = document.createElement("span")
+      pill.className = "mini-pill"
+      pill.textContent = "Activo"
+      header.append(title, pill)
+    } else {
+      header.appendChild(title)
+    }
 
-</div>
+    const meta = document.createElement("p")
+    meta.className = "muted-copy"
+    meta.textContent = professors.length
+      ? professors.join(" | ")
+      : "Sin profesor asignado"
 
-`).join("")
+    const actions = document.createElement("div")
+    actions.className = "card-actions"
 
+    const viewButton = document.createElement("button")
+    viewButton.type = "button"
+    viewButton.className = "text-btn"
+    viewButton.textContent = "Ver horario"
+    viewButton.addEventListener("click", () => {
+      app.setFilter("course", course)
+    })
+
+    actions.appendChild(viewButton)
+    card.append(header, meta, actions)
+    dom.coursesGrid.appendChild(card)
+  })
 }
-
-
-/* =========================
-SELECT COURSE
-========================= */
-
-function selectCourse(course){
-
-if(!courseSelector) return
-
-courseSelector.value = course
-
-const match = schedule.find(e=>e.course===course)
-
-if(match && match.professor)
-profSelector.value = match.professor
-
-updateFilters()
-renderWeek()
-
-}
-
-
-/* =========================
-PROFESSOR COURSES
-========================= */
-
-function showProfessorCourses(prof){
-
-if(!coursesGrid) return
-
-const courses = [...new Set(
-schedule
-.filter(e=>e.professor===prof)
-.map(e=>e.course)
-)]
-
-coursesGrid.innerHTML = `
-
-<h2>${prof}</h2>
-
-${courses.map(c=>`
-
-<div class="course-card">
-
-<h3>${c}</h3>
-
-<button onclick="selectCourse('${c}')">
-Ver horario
-</button>
-
-</div>
-
-`).join("")}
-
-`
-
-}
-
-
-/* =========================
-PORTAL INIT
-========================= */
-
-function initPortal(){
-
-renderFaculty()
-renderCourses()
-
-}
-
-document.addEventListener("DOMContentLoaded", initPortal)
+})()

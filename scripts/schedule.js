@@ -2,485 +2,676 @@
 DEN Horario 2026 – schedule.js
 ===================================================== */
 
-let schedule = []
-
-/* =========================
-GOOGLE SCHOLAR
-========================= */
-
+(function(){
 const scholarLinks = {
-
-"Luis Torres":
-"https://scholar.google.com/citations?user=QHzMa7MAAAAJ&hl=en",
-
-"Carlos Poblete":
-"https://scholar.google.com/citations?user=s0uM4qcAAAAJ&hl=es",
-
-"Nélyda Campos":
-"https://scholar.google.com/citations?user=Nh6N6mQAAAAJ&hl=es",
-
-"Florencia Gabrielli":
-"https://scholar.google.com/citations?user=TnxT694AAAAJ&hl=es",
-
-"Claudio Aqueveque":
-"https://scholar.google.com/citations?user=JLauNGgAAAAJ&hl=es"
-
+  "Luis Torres": "https://scholar.google.com/citations?user=QHzMa7MAAAAJ&hl=en",
+  "Carlos Poblete": "https://scholar.google.com/citations?user=s0uM4qcAAAAJ&hl=es",
+  "Nélyda Campos": "https://scholar.google.com/citations?user=Nh6N6mQAAAAJ&hl=es",
+  "Florencia Gabrielli": "https://scholar.google.com/citations?user=TnxT694AAAAJ&hl=es",
+  "Claudio Aqueveque": "https://scholar.google.com/citations?user=JLauNGgAAAAJ&hl=es"
 }
 
-/* =========================
-DOM
-========================= */
+const palette = [
+  "c-blue",
+  "c-green",
+  "c-orange",
+  "c-purple",
+  "c-pink",
+  "c-indigo",
+  "c-teal",
+  "c-yellow",
+  "c-red"
+]
 
-const weekSelector = document.getElementById("weekSelector")
-const profSelector = document.getElementById("profSelector")
-const courseSelector = document.getElementById("courseSelector")
+const state = {
+  schedule: [],
+  courseColorMap: {},
+  filters: {
+    week: "all",
+    professor: "all",
+    course: "all",
+    query: ""
+  },
+  subscribers: []
+}
 
-const summary = document.getElementById("summary")
-const tableWrap = document.getElementById("tableWrap")
-const legend = document.getElementById("legend")
+const dom = {}
 
-const downloadICS = document.getElementById("downloadICS")
+document.addEventListener("DOMContentLoaded", init)
 
-/* =========================
-LOAD DATA
-========================= */
+function init(){
+  cacheDom()
+  bindEvents()
+  fetchSchedule()
+}
 
-fetch("data/schedule.json")
-.then(r=>{
-if(!r.ok) throw new Error("No se pudo cargar schedule.json")
-return r.json()
-})
-.then(data=>{
+function cacheDom(){
+  dom.weekSelector = document.getElementById("weekSelector")
+  dom.profSelector = document.getElementById("profSelector")
+  dom.courseSelector = document.getElementById("courseSelector")
+  dom.searchInput = document.getElementById("searchInput")
+  dom.resetFilters = document.getElementById("resetFilters")
+  dom.downloadICS = document.getElementById("downloadICS")
+  dom.summary = document.getElementById("summary")
+  dom.weekTitle = document.getElementById("weekTitle")
+  dom.weekSubtitle = document.getElementById("weekSubtitle")
+  dom.legend = document.getElementById("legend")
+  dom.tableWrap = document.getElementById("tableWrap")
+}
 
-schedule = data
+function bindEvents(){
+  dom.weekSelector.addEventListener("change", event => {
+    state.filters.week = event.target.value
+    syncDependentFilters()
+    render()
+  })
 
-schedule.sort((a,b)=>new Date(a.date)-new Date(b.date))
+  dom.profSelector.addEventListener("change", event => {
+    state.filters.professor = event.target.value
+    syncDependentFilters()
+    render()
+  })
 
-setDefaultWeek()
-updateFilters()
-renderWeek()
+  dom.courseSelector.addEventListener("change", event => {
+    state.filters.course = event.target.value
+    syncDependentFilters()
+    render()
+  })
 
-})
-.catch(err=>{
-console.error(err)
-tableWrap.innerHTML =
-`<div class="empty">Error al cargar los datos del horario.</div>`
-})
+  dom.searchInput.addEventListener("input", event => {
+    state.filters.query = event.target.value.trim()
+    syncDependentFilters()
+    render()
+  })
 
-/* =========================
-UTILS
-========================= */
+  dom.resetFilters.addEventListener("click", resetFilters)
+  dom.downloadICS.addEventListener("click", downloadCalendar)
+}
+
+function fetchSchedule(){
+  fetch("data/schedule.json")
+    .then(response => {
+      if(!response.ok){
+        throw new Error("No se pudo cargar schedule.json")
+      }
+
+      return response.json()
+    })
+    .then(data => {
+      state.schedule = data
+        .map(normalizeEvent)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.sortStart.localeCompare(b.sortStart))
+
+      state.filters.week = getDefaultWeek()
+      renderSelectors()
+      syncDependentFilters()
+      render()
+    })
+    .catch(error => {
+      console.error(error)
+      renderError("Error al cargar los datos del horario.")
+    })
+}
+
+function normalizeEvent(item){
+  const professor = typeof item.professor === "string" ? item.professor.trim() : ""
+  const location = typeof item.location === "string" ? item.location.trim() : ""
+  const time = typeof item.time === "string" ? item.time.trim() : ""
+  const blocks = parseTimeBlocks(time)
+
+  return {
+    date: item.date,
+    course: item.course.trim(),
+    professor,
+    location,
+    time,
+    timeBlocks: blocks,
+    hasProfessor: Boolean(professor),
+    sortStart: blocks[0]?.start ?? "99:99"
+  }
+}
+
+function parseTimeBlocks(timeLabel){
+  if(!timeLabel){
+    return []
+  }
+
+  return timeLabel
+    .split("·")
+    .map(part => part.trim())
+    .map(part => {
+      const match = part.match(/^(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})$/)
+      if(!match){
+        return null
+      }
+
+      return {
+        start: match[1],
+        end: match[2],
+        label: `${match[1]} - ${match[2]}`
+      }
+    })
+    .filter(Boolean)
+}
 
 function formatLocalDate(date){
-
-const y = date.getFullYear()
-const m = String(date.getMonth()+1).padStart(2,"0")
-const d = String(date.getDate()).padStart(2,"0")
-
-return `${y}-${m}-${d}`
-
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
 }
 
 function mondayOf(dateStr){
-
-const d = new Date(dateStr+"T00:00:00")
-const weekday = (d.getDay()+6)%7
-d.setDate(d.getDate()-weekday)
-
-return formatLocalDate(d)
-
+  const date = new Date(`${dateStr}T00:00:00`)
+  const weekday = (date.getDay() + 6) % 7
+  date.setDate(date.getDate() - weekday)
+  return formatLocalDate(date)
 }
 
 function prettyDate(dateStr){
-
-const d = new Date(dateStr+"T00:00:00")
-
-return d.toLocaleDateString("es-CL",{
-weekday:"long",
-day:"2-digit",
-month:"long",
-year:"numeric"
-})
-
+  const date = new Date(`${dateStr}T00:00:00`)
+  return date.toLocaleDateString("es-CL", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  })
 }
 
-function renderProfessor(name){
-
-if(!name) return "-"
-
-const scholar = scholarLinks[name]
-
-if(!scholar){
-return name
+function shortDate(dateStr){
+  const date = new Date(`${dateStr}T00:00:00`)
+  return date.toLocaleDateString("es-CL", {
+    day: "2-digit",
+    month: "short"
+  })
 }
 
-return `
-<span class="prof-name">${name}</span>
-<a href="${scholar}" target="_blank" class="scholar-link">
-📚
-</a>
-`
-
+function getDefaultWeek(){
+  const today = formatLocalDate(new Date())
+  const currentMonday = mondayOf(today)
+  const weeks = getWeeks()
+  return weeks.includes(currentMonday) ? currentMonday : "all"
 }
 
-/* =========================
-COURSE COLORS
-========================= */
-
-const courseColorMap = {}
-
-const palette = [
-"c-blue",
-"c-green",
-"c-orange",
-"c-purple",
-"c-pink",
-"c-indigo",
-"c-teal",
-"c-yellow",
-"c-red"
-]
-
-function getCourseColor(course){
-
-if(!courseColorMap[course]){
-
-const index = Object.keys(courseColorMap).length % palette.length
-courseColorMap[course] = palette[index]
-
+function getWeeks(){
+  return [...new Set(state.schedule.map(item => mondayOf(item.date)))]
 }
 
-return courseColorMap[course]
+function getVisibleEvents(filters = state.filters){
+  const query = normalizeSearchText(filters.query)
 
+  return state.schedule.filter(item => {
+    if(filters.week !== "all" && mondayOf(item.date) !== filters.week){
+      return false
+    }
+
+    if(filters.professor === "sin_profesor" && item.hasProfessor){
+      return false
+    }
+
+    if(filters.professor !== "all" && filters.professor !== "sin_profesor" && item.professor !== filters.professor){
+      return false
+    }
+
+    if(filters.course !== "all" && item.course !== filters.course){
+      return false
+    }
+
+    if(!query){
+      return true
+    }
+
+    const haystack = normalizeSearchText([item.course, item.professor, item.location, item.time].join(" "))
+    return haystack.includes(query)
+  })
 }
 
-/* =========================
-DEFAULT WEEK
-========================= */
-
-function setDefaultWeek(){
-
-const today = new Date()
-
-const weekday = (today.getDay()+6)%7
-today.setDate(today.getDate()-weekday)
-
-const monday = formatLocalDate(today)
-
-for(const option of weekSelector.options){
-
-if(option.value===monday){
-weekSelector.value=monday
-return
+function normalizeSearchText(value){
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
 }
 
+function getVisibleProfessors(filters = state.filters){
+  const scopedFilters = { ...filters, professor: "all" }
+  const items = getVisibleEvents(scopedFilters)
+  return [...new Set(items.map(item => item.professor).filter(Boolean))]
 }
 
-weekSelector.value="all"
-
+function getVisibleCourses(filters = state.filters){
+  const scopedFilters = { ...filters, course: "all" }
+  const items = getVisibleEvents(scopedFilters)
+  return [...new Set(items.map(item => item.course))]
 }
 
-/* =========================
-FILTERS
-========================= */
-
-function updateFilters(){
-
-const week = weekSelector.value
-let prof = profSelector.value
-let course = courseSelector.value
-
-let base = schedule
-
-if(week!=="all")
-base = base.filter(e=>mondayOf(e.date)===week)
-
-let profBase = base
-if(course!=="all")
-profBase = profBase.filter(e=>e.course===course)
-
-let courseBase = base
-if(prof!=="all"){
-
-if(prof==="sin_profesor")
-courseBase = courseBase.filter(e=>!e.professor)
-
-else
-courseBase = courseBase.filter(e=>e.professor===prof)
-
+function renderSelectors(){
+  renderWeekOptions()
+  syncDependentFilters()
+  syncControls()
 }
 
-const profs = [...new Set(profBase.map(e=>e.professor).filter(Boolean))]
-const courses = [...new Set(courseBase.map(e=>e.course))]
+function renderWeekOptions(){
+  const weeks = getWeeks()
+  dom.weekSelector.innerHTML = ""
+  dom.weekSelector.appendChild(createOption("all", "Todas las semanas"))
 
-profSelector.innerHTML =
-`<option value="all">Todos</option>` +
-profs.map(p=>`<option value="${p}">${p}</option>`).join("") +
-`<option value="sin_profesor">Sin profesor asignado</option>`
-
-courseSelector.innerHTML =
-`<option value="all">Todos</option>` +
-courses.map(c=>`<option value="${c}">${c}</option>`).join("")
-
-if(profSelector.querySelector(`option[value="${prof}"]`))
-profSelector.value = prof
-
-if(courseSelector.querySelector(`option[value="${course}"]`))
-courseSelector.value = course
-
+  weeks.forEach(week => {
+    dom.weekSelector.appendChild(createOption(week, getWeekLabel(week)))
+  })
 }
 
-/* =========================
-SUMMARY
-========================= */
+function syncDependentFilters(){
+  const availableProfessors = getVisibleProfessors()
+  const availableCourses = getVisibleCourses()
+
+  if(state.filters.professor !== "all" &&
+    state.filters.professor !== "sin_profesor" &&
+    !availableProfessors.includes(state.filters.professor)){
+    state.filters.professor = "all"
+  }
+
+  if(state.filters.course !== "all" && !availableCourses.includes(state.filters.course)){
+    state.filters.course = "all"
+  }
+
+  renderFilterOptions(dom.profSelector, [
+    { value: "all", label: "Todos" },
+    ...availableProfessors.map(name => ({ value: name, label: name })),
+    { value: "sin_profesor", label: "Sin profesor asignado" }
+  ], state.filters.professor)
+
+  renderFilterOptions(dom.courseSelector, [
+    { value: "all", label: "Todos" },
+    ...availableCourses.map(name => ({ value: name, label: name }))
+  ], state.filters.course)
+
+  syncControls()
+}
+
+function renderFilterOptions(select, options, selectedValue){
+  select.innerHTML = ""
+  options.forEach(option => {
+    select.appendChild(createOption(option.value, option.label))
+  })
+  select.value = selectedValue
+}
+
+function syncControls(){
+  dom.weekSelector.value = state.filters.week
+  dom.profSelector.value = state.filters.professor
+  dom.courseSelector.value = state.filters.course
+  dom.searchInput.value = state.filters.query
+}
+
+function createOption(value, label){
+  const option = document.createElement("option")
+  option.value = value
+  option.textContent = label
+  return option
+}
+
+function render(){
+  const rows = getVisibleEvents()
+  renderSummary(rows)
+  renderHeading(rows)
+  renderLegend(rows)
+  renderTable(rows)
+  notifySubscribers(rows)
+}
 
 function renderSummary(rows){
+  const totalClasses = rows.filter(row => !isSpecialActivity(row.course)).length
+  const totalCourses = new Set(rows.map(row => row.course)).size
+  const totalProfessors = new Set(rows.map(row => row.professor).filter(Boolean)).size
+  const totalLocations = new Set(rows.map(row => normalizeLocationLabel(row.location))).size
 
-const classes = rows.filter(r=>
-!r.course.toLowerCase().includes("evaluacion") &&
-!r.course.toLowerCase().includes("induccion")
-).length
+  dom.summary.innerHTML = ""
 
-const courses = new Set(rows.map(r=>r.course)).size
-const profs = new Set(rows.map(r=>r.professor).filter(Boolean)).size
+  ;[
+    { value: rows.length, label: "actividades visibles" },
+    { value: totalClasses, label: "clases formales" },
+    { value: totalCourses, label: "cursos activos" },
+    { value: totalProfessors, label: "profesores visibles" },
+    { value: totalLocations, label: "salas o modalidades" }
+  ].forEach(item => {
+    const card = document.createElement("article")
+    card.className = "sum-card"
 
-summary.innerHTML =
+    const number = document.createElement("div")
+    number.className = "k"
+    number.textContent = String(item.value)
 
-`
-<article class="sum-card">
-<div class="k">${rows.length}</div>
-<div class="v">actividades</div>
-</article>
+    const label = document.createElement("div")
+    label.className = "v"
+    label.textContent = item.label
 
-<article class="sum-card">
-<div class="k">${classes}</div>
-<div class="v">clases</div>
-</article>
-
-<article class="sum-card">
-<div class="k">${courses}</div>
-<div class="v">cursos</div>
-</article>
-
-<article class="sum-card">
-<div class="k">${profs}</div>
-<div class="v">profesores</div>
-</article>
-`
-
+    card.append(number, label)
+    dom.summary.appendChild(card)
+  })
 }
 
-/* =========================
-RENDER WEEK
-========================= */
+function renderHeading(rows){
+  if(state.filters.week === "all"){
+    dom.weekTitle.textContent = "Programación completa"
+    dom.weekSubtitle.textContent = `${rows.length} actividades encontradas en el periodo enero-julio 2026.`
+    return
+  }
 
-function renderWeek(){
-
-const week = weekSelector.value
-const prof = profSelector.value
-const course = courseSelector.value
-
-const rows = schedule
-.filter(e=>week==="all"||mondayOf(e.date)===week)
-.filter(e=>{
-if(prof==="all") return true
-if(prof==="sin_profesor") return !e.professor
-return e.professor===prof
-})
-.filter(e=>course==="all"||e.course===course)
-.sort((a,b)=>new Date(a.date)-new Date(b.date))
-
-renderSummary(rows)
-renderLegend(rows)
-
-if(!rows.length){
-
-tableWrap.innerHTML =
-`<div class="empty">No hay actividades.</div>`
-
-return
-
+  dom.weekTitle.textContent = getWeekLabel(state.filters.week)
+  dom.weekSubtitle.textContent = `${rows.length} actividades registradas para la semana seleccionada.`
 }
-
-tableWrap.innerHTML =
-
-`
-<table>
-
-<thead>
-<tr>
-<th>Fecha</th>
-<th>Curso</th>
-<th>Profesor</th>
-<th>Horario</th>
-<th>Sala</th>
-</tr>
-</thead>
-
-<tbody>
-
-${rows.map(r=>`
-
-<tr>
-
-<td data-label="Fecha">
-
-<div class="datebox">
-
-<div class="day">${prettyDate(r.date).split(",")[0]}</div>
-<div class="date">${prettyDate(r.date).replace(/^[^,]+,\s*/,"")}</div>
-
-</div>
-
-</td>
-
-<td data-label="Curso">
-<span class="badge ${getCourseColor(r.course)}">${r.course}</span>
-</td>
-
-<td data-label="Profesor">
-${renderProfessor(r.professor)}
-</td>
-
-<td data-label="Horario">${r.time || "-"}</td>
-
-<td data-label="Sala">${r.location || "-"}</td>
-
-</tr>
-
-`).join("")}
-
-</tbody>
-</table>
-`
-
-}
-
-/* =========================
-LEGEND
-========================= */
 
 function renderLegend(rows){
+  const courses = [...new Set(rows.map(item => item.course))]
+  dom.legend.innerHTML = ""
 
-const uniqueCourses = [...new Set(rows.map(e=>e.course))]
-
-legend.innerHTML = uniqueCourses
-.map(course => `
-<span class="badge ${getCourseColor(course)} legend-course" data-course="${course}">
-${course}
-</span>
-`)
-.join("")
-
-document.querySelectorAll(".legend-course").forEach(badge=>{
-
-badge.addEventListener("click",()=>{
-
-courseSelector.value = badge.dataset.course
-
-const match = schedule.find(e=>e.course===badge.dataset.course)
-
-if(match && match.professor)
-profSelector.value = match.professor
-
-renderWeek()
-
-})
-
-})
-
+  courses.forEach(course => {
+    const button = document.createElement("button")
+    button.type = "button"
+    button.className = `badge legend-course ${getCourseColor(course)}`
+    button.textContent = course
+    button.setAttribute("aria-pressed", String(state.filters.course === course))
+    button.addEventListener("click", () => {
+      state.filters.course = state.filters.course === course ? "all" : course
+      syncDependentFilters()
+      render()
+    })
+    dom.legend.appendChild(button)
+  })
 }
 
-/* =========================
-SYNC PROF ↔ COURSE
-========================= */
+function renderTable(rows){
+  dom.tableWrap.innerHTML = ""
 
-profSelector.addEventListener("change",()=>{
+  if(!rows.length){
+    const empty = document.createElement("div")
+    empty.className = "empty"
+    empty.textContent = "No hay actividades que coincidan con los filtros actuales."
+    dom.tableWrap.appendChild(empty)
+    return
+  }
 
-const prof = profSelector.value
+  const table = document.createElement("table")
+  const thead = document.createElement("thead")
+  const headerRow = document.createElement("tr")
 
-if(prof!=="all" && prof!=="sin_profesor"){
+  ;["Fecha", "Curso", "Profesor", "Horario", "Sala / modalidad"].forEach(label => {
+    const th = document.createElement("th")
+    th.scope = "col"
+    th.textContent = label
+    headerRow.appendChild(th)
+  })
 
-const match = schedule.find(e=>e.professor===prof)
+  thead.appendChild(headerRow)
 
-if(match)
-courseSelector.value = match.course
+  const tbody = document.createElement("tbody")
+  rows.forEach(row => {
+    tbody.appendChild(renderRow(row))
+  })
 
+  table.append(thead, tbody)
+  dom.tableWrap.appendChild(table)
 }
 
-updateFilters()
-renderWeek()
-
-})
-
-courseSelector.addEventListener("change",()=>{
-
-const course = courseSelector.value
-
-if(course!=="all"){
-
-const match = schedule.find(e=>e.course===course)
-
-if(match)
-profSelector.value = match.professor || "all"
-
+function renderRow(row){
+  const tr = document.createElement("tr")
+  tr.appendChild(renderDateCell(row.date))
+  tr.appendChild(renderCourseCell(row.course))
+  tr.appendChild(renderProfessorCell(row.professor))
+  tr.appendChild(renderTextCell("Horario", row.time || "Sin bloque horario"))
+  tr.appendChild(renderTextCell("Sala / modalidad", row.location || "Por definir"))
+  return tr
 }
 
-updateFilters()
-renderWeek()
+function renderDateCell(date){
+  const td = document.createElement("td")
+  td.dataset.label = "Fecha"
 
-})
+  const wrapper = document.createElement("div")
+  wrapper.className = "datebox"
 
-weekSelector.addEventListener("change",()=>{
+  const parts = prettyDate(date).split(",")
 
-updateFilters()
-renderWeek()
+  const day = document.createElement("div")
+  day.className = "day"
+  day.textContent = parts[0]
 
-})
+  const detail = document.createElement("div")
+  detail.className = "date"
+  detail.textContent = parts.slice(1).join(",").trim()
 
-/* =========================
-ICS EXPORT
-========================= */
+  wrapper.append(day, detail)
+  td.appendChild(wrapper)
+  return td
+}
 
-downloadICS.addEventListener("click",()=>{
+function renderCourseCell(course){
+  const td = document.createElement("td")
+  td.dataset.label = "Curso"
 
-let ics=`BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//DEN//Horario 2026//ES
-`
+  const button = document.createElement("button")
+  button.type = "button"
+  button.className = `badge badge-button ${getCourseColor(course)}`
+  button.textContent = course
+  button.addEventListener("click", () => {
+    state.filters.course = course
+    syncDependentFilters()
+    render()
+  })
 
-schedule.forEach((ev,i)=>{
+  td.appendChild(button)
+  return td
+}
 
-if(!ev.time) return
+function renderProfessorCell(name){
+  const td = document.createElement("td")
+  td.dataset.label = "Profesor"
 
-const parts = ev.time.split("-")
-if(parts.length<2) return
+  if(!name){
+    td.textContent = "Sin profesor asignado"
+    return td
+  }
 
-const start = ev.date.replace(/-/g,"")+"T"+parts[0].replace(":","")+"00"
-const end = ev.date.replace(/-/g,"")+"T"+parts[1].replace(":","")+"00"
+  const wrapper = document.createElement("div")
+  wrapper.className = "professor-cell"
 
-ics+=`
+  const trigger = document.createElement("button")
+  trigger.type = "button"
+  trigger.className = "text-btn professor-trigger"
+  trigger.textContent = name
+  trigger.addEventListener("click", () => {
+    state.filters.professor = name
+    syncDependentFilters()
+    render()
+  })
+  wrapper.appendChild(trigger)
 
-BEGIN:VEVENT
-UID:den${i}@udd.cl
-DTSTART:${start}
-DTEND:${end}
-SUMMARY:${ev.course}
-DESCRIPTION:Profesor ${ev.professor||"TBA"}
-LOCATION:${ev.location||""}
-END:VEVENT
-`
+  if(scholarLinks[name]){
+    const link = document.createElement("a")
+    link.href = scholarLinks[name]
+    link.className = "scholar-link"
+    link.target = "_blank"
+    link.rel = "noopener noreferrer"
+    link.textContent = "Scholar"
+    wrapper.appendChild(link)
+  }
 
-})
+  td.appendChild(wrapper)
+  return td
+}
 
-ics+=`\nEND:VCALENDAR`
+function renderTextCell(label, value){
+  const td = document.createElement("td")
+  td.dataset.label = label
+  td.textContent = value
+  return td
+}
 
-const blob = new Blob([ics],{type:"text/calendar"})
-const url = URL.createObjectURL(blob)
+function renderError(message){
+  dom.weekTitle.textContent = "Horario no disponible"
+  dom.weekSubtitle.textContent = "No se pudieron cargar los datos."
+  dom.summary.innerHTML = ""
+  dom.legend.innerHTML = ""
+  dom.tableWrap.innerHTML = ""
 
-const a=document.createElement("a")
-a.href=url
-a.download="den_horario_2026.ics"
-a.click()
+  const empty = document.createElement("div")
+  empty.className = "empty"
+  empty.textContent = message
+  dom.tableWrap.appendChild(empty)
+}
 
-})
+function getWeekLabel(weekStart){
+  const start = new Date(`${weekStart}T00:00:00`)
+  const end = new Date(`${weekStart}T00:00:00`)
+  end.setDate(end.getDate() + 4)
+
+  const startLabel = start.toLocaleDateString("es-CL", {
+    day: "numeric",
+    month: "long"
+  })
+
+  const endLabel = end.toLocaleDateString("es-CL", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  })
+
+  return `Semana ${startLabel} - ${endLabel}`
+}
+
+function isSpecialActivity(course){
+  const label = course.toLowerCase()
+  return label.includes("evaluaci") || label.includes("inducci")
+}
+
+function normalizeLocationLabel(location){
+  return location || "Por definir"
+}
+
+function getCourseColor(course){
+  if(!state.courseColorMap[course]){
+    const index = Object.keys(state.courseColorMap).length % palette.length
+    state.courseColorMap[course] = palette[index]
+  }
+
+  return state.courseColorMap[course]
+}
+
+function downloadCalendar(){
+  const visible = getVisibleEvents()
+  const timestampDate = formatLocalDate(new Date())
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//DEN//Horario 2026//ES",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH"
+  ]
+
+  visible.forEach((event, index) => {
+    event.timeBlocks.forEach((block, blockIndex) => {
+      lines.push("BEGIN:VEVENT")
+      lines.push(`UID:den-${index}-${blockIndex}@udd.cl`)
+      lines.push(`DTSTAMP:${toICSDateTime(timestampDate, "00:00")}`)
+      lines.push(`DTSTART:${toICSDateTime(event.date, block.start)}`)
+      lines.push(`DTEND:${toICSDateTime(event.date, block.end)}`)
+      lines.push(`SUMMARY:${escapeICS(event.course)}`)
+      lines.push(`DESCRIPTION:${escapeICS(buildDescription(event))}`)
+      lines.push(`LOCATION:${escapeICS(event.location || "Por definir")}`)
+      lines.push("END:VEVENT")
+    })
+  })
+
+  lines.push("END:VCALENDAR")
+
+  const blob = new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement("a")
+  anchor.href = url
+  anchor.download = "den_horario_2026.ics"
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
+
+function buildDescription(event){
+  const professor = event.professor || "Sin profesor asignado"
+  return `Profesor: ${professor} | Horario: ${event.time || "Por definir"}`
+}
+
+function toICSDateTime(date, time){
+  const [hours, minutes] = time.split(":")
+  return `${date.replace(/-/g, "")}T${hours}${minutes}00`
+}
+
+function escapeICS(value){
+  return String(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/\n/g, "\\n")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;")
+}
+
+function notifySubscribers(rows){
+  const snapshot = getSnapshot(rows)
+  state.subscribers.forEach(listener => listener(snapshot))
+}
+
+function getSnapshot(rows = getVisibleEvents()){
+  return {
+    filters: { ...state.filters },
+    schedule: [...state.schedule],
+    visibleEvents: [...rows],
+    scholarLinks: { ...scholarLinks },
+    helpers: {
+      formatLocalDate,
+      mondayOf,
+      prettyDate,
+      shortDate,
+      getCourseColor,
+      getWeekLabel
+    }
+  }
+}
+
+function subscribe(listener){
+  state.subscribers.push(listener)
+
+  if(state.schedule.length){
+    listener(getSnapshot())
+  }
+
+  return () => {
+    state.subscribers = state.subscribers.filter(item => item !== listener)
+  }
+}
+
+function setFilter(name, value){
+  if(!(name in state.filters)){
+    return
+  }
+
+  state.filters[name] = value
+  syncDependentFilters()
+  render()
+}
+
+function resetFilters(){
+  state.filters.week = getDefaultWeek()
+  state.filters.professor = "all"
+  state.filters.course = "all"
+  state.filters.query = ""
+  syncControls()
+  syncDependentFilters()
+  render()
+}
+
+window.DENApp = {
+  subscribe,
+  setFilter,
+  resetFilters,
+  getState: () => getSnapshot(),
+  getVisibleEvents: () => getVisibleEvents(),
+  getWeekLabel
+}
+})()

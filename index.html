@@ -1,247 +1,146 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Horario DEN 2026 | Doctorado en Economía y Negocios UDD</title>
-
 <link rel="stylesheet" href="styles/styles.css">
-
-<!-- SCRIPTS -->
 <script src="scripts/schedule.js" defer></script>
 <script src="scripts/portal.js" defer></script>
 <script src="scripts/chatbot.js" defer></script>
-
 </head>
-
 <body>
-
-
-
 <main class="container">
-
-
-<!-- =========================
-HORARIO
-========================= -->
-
-<section id="scheduleSection" class="portal-section active-section">
-
-<header class="hero">
-
-<h1>Horario Académico DEN 2026</h1>
-
-<p>
-Programación académica del Doctorado en Economía y Negocios (DEN).
-Permite visualizar clases, profesores, horarios y salas desde enero a julio de 2026.
+<section class="hero">
+<div class="hero-copy">
+<p class="eyebrow">Doctorado en Economía y Negocios</p>
+<h1>Horario académico DEN 2026</h1>
+<p class="hero-text">
+Consulta clases, inducciones y evaluaciones desde una sola vista. El horario se
+actualiza desde la base de datos local y permite filtrar por semana, profesor,
+curso o búsqueda libre.
 </p>
+</div>
 
-<div class="controls">
+<div class="hero-meta" aria-label="Resumen de cobertura del horario">
+<article class="meta-card">
+<strong>Enero a julio 2026</strong>
+<span>Periodo visible</span>
+</article>
+<article class="meta-card">
+<strong>Vista académica</strong>
+<span>Profesores, salas y bloques</span>
+</article>
+<article class="meta-card">
+<strong>Exportable</strong>
+<span>Calendario `.ics` compatible</span>
+</article>
+</div>
+</section>
 
+<section class="workspace" aria-label="Panel de horario académico">
+<div class="toolbar">
 <div class="control">
-
 <label for="weekSelector">Semana</label>
-
-<select id="weekSelector">
-
-<option value="all">Todas las semanas</option>
-
-<option value="2026-01-05">Semana 5–9 Enero 2026</option>
-<option value="2026-01-12">Semana 12–16 Enero 2026</option>
-<option value="2026-01-19">Semana 19–23 Enero 2026</option>
-<option value="2026-01-26">Semana 26–30 Enero 2026</option>
-
-<option value="2026-03-02">Semana 2–6 Marzo 2026</option>
-<option value="2026-03-09">Semana 9–13 Marzo 2026</option>
-<option value="2026-03-16">Semana 16–20 Marzo 2026</option>
-<option value="2026-03-23">Semana 23–27 Marzo 2026</option>
-<option value="2026-03-30">Semana 30 Marzo – 3 Abril 2026</option>
-
-<option value="2026-04-06">Semana 6–10 Abril 2026</option>
-<option value="2026-04-13">Semana 13–17 Abril 2026</option>
-<option value="2026-04-20">Semana 20–24 Abril 2026</option>
-
-<option value="2026-05-04">Semana 4–8 Mayo 2026</option>
-<option value="2026-05-11">Semana 11–15 Mayo 2026</option>
-<option value="2026-05-18">Semana 18–22 Mayo 2026</option>
-<option value="2026-05-25">Semana 25–29 Mayo 2026</option>
-
-<option value="2026-06-01">Semana 1–5 Junio 2026</option>
-<option value="2026-06-08">Semana 8–12 Junio 2026</option>
-<option value="2026-06-15">Semana 15–19 Junio 2026</option>
-<option value="2026-06-22">Semana 22–26 Junio 2026</option>
-<option value="2026-06-29">Semana 29 Junio – 3 Julio 2026</option>
-
-</select>
-
+<select id="weekSelector"></select>
 </div>
 
-
 <div class="control">
-
 <label for="profSelector">Profesor</label>
-
-<select id="profSelector">
-
-<option value="all">Todos</option>
-<option value="Florencia Gabrielli">Florencia Gabrielli</option>
-<option value="Luis Torres">Luis Torres</option>
-<option value="Carlos Poblete">Carlos Poblete</option>
-<option value="Nélyda Campos">Nélyda Campos</option>
-<option value="Claudio Aqueveque">Claudio Aqueveque</option>
-<option value="sin_profesor">Sin profesor asignado</option>
-
-</select>
-
+<select id="profSelector"></select>
 </div>
 
-
 <div class="control">
-
 <label for="courseSelector">Curso</label>
-
-<select id="courseSelector">
-
-<option value="all">Todos</option>
-
-<option value="Probabilidad y Estadística">
-Probabilidad y Estadística
-</option>
-
-<option value="Matemática">
-Matemática
-</option>
-
-<option value="Microeconomía">
-Microeconomía
-</option>
-
-<option value="Management - DEN3C113">
-Management - DEN3C113
-</option>
-
-<option value="Research Method - DEN3C114">
-Research Method - DEN3C114
-</option>
-
-<option value="Fundamentos Económicos de Investigación en Negocios I - DEN3C112">
-Fundamentos Económicos de Investigación en Negocios I - DEN3C112
-</option>
-
-<option value="Métodos Cuantitativos de la Investigación en Negocios - DEN3C111">
-Métodos Cuantitativos de la Investigación en Negocios - DEN3C111
-</option>
-
-<option value="Inducción SCL">
-Inducción SCL
-</option>
-
-<option value="Evaluación">
-Evaluación
-</option>
-
-</select>
-
+<select id="courseSelector"></select>
 </div>
-
 
 <div class="control">
+<label for="searchInput">Buscar</label>
+<input
+id="searchInput"
+name="searchInput"
+type="search"
+placeholder="Curso, profesor, sala o modalidad"
+autocomplete="off"
+>
+</div>
 
-<label>&nbsp;</label>
-
-<button id="downloadICS" class="calendar-btn" type="button">
-📅 Descargar calendario (.ics)
+<div class="control actions">
+<button id="resetFilters" class="secondary-btn" type="button">
+Limpiar filtros
 </button>
-
+<button id="downloadICS" class="primary-btn" type="button">
+Descargar calendario (.ics)
+</button>
+</div>
 </div>
 
-</div>
+<section class="summary" id="summary" aria-live="polite"></section>
 
-</header>
-
-
-<section class="summary" id="summary"></section>
-
-
-<section class="panel">
-
+<div class="content-grid">
+<section class="panel schedule-panel">
 <header class="panel-head">
-
 <div>
-
-<h2 id="weekTitle">Semana</h2>
+<p class="section-label">Agenda filtrada</p>
+<h2 id="weekTitle">Cargando horario</h2>
 <p id="weekSubtitle"></p>
-
 </div>
-
-<div class="legend" id="legend"></div>
-
+<div class="legend" id="legend" aria-label="Cursos visibles"></div>
 </header>
 
-<div id="tableWrap"></div>
+<div id="tableWrap" class="table-wrap" aria-live="polite"></div>
 
-<footer class="footer">
-
+<footer class="footer-note">
 Incluye inducciones y evaluaciones cuando aparecen en la planificación académica.
-
 </footer>
-
 </section>
 
+<aside class="sidebar">
+<section class="panel panel-compact">
+<header class="side-head">
+<div>
+<p class="section-label">Profesores</p>
+<h2>Claustro docente</h2>
+</div>
+<button id="showAllFaculty" class="text-btn" type="button">Ver todos</button>
+</header>
+<div id="facultyGrid" class="stack-list"></div>
 </section>
 
-
+<section class="panel panel-compact">
+<header class="side-head">
+<div>
+<p class="section-label">Cursos</p>
+<h2>Mapa de cursos</h2>
+</div>
+<button id="showAllCourses" class="text-btn" type="button">Ver todos</button>
+</header>
+<div id="coursesGrid" class="stack-list"></div>
+</section>
+</aside>
+</div>
+</section>
 </main>
 
-
-<!-- =========================
-CHATBOT
-========================= -->
-
-<div id="den-chatbot" class="minimized">
-
-<header id="den-chat-header">
-
-<span>HorarioBot</span>
-
-<button id="chat-toggle"
-aria-label="Minimizar chatbot"
-type="button">+</button>
-
+<section id="den-chatbot" class="chatbot minimized" aria-label="Asistente del horario">
+<header class="chat-header">
+<div>
+<span class="chat-title">HorarioBot</span>
+<p class="chat-subtitle">Consultas rápidas del calendario</p>
+</div>
+<button
+id="chat-toggle"
+class="icon-btn"
+aria-label="Abrir o cerrar chatbot"
+aria-expanded="false"
+type="button"
+>
++
+</button>
 </header>
 
-<div id="den-chat-window">
-
-<div class="den-bot">
-¿Qué quieres saber?
-</div>
-
-<div class="den-buttons">
-
-<button type="button" onclick="nextClassToday()">
-Clases de hoy
-</button>
-
-<button type="button" onclick="nextClassWeek()">
-Clases esta semana
-</button>
-
-<button type="button" onclick="nextClassGlobal()">
-Próxima clase
-</button>
-
-<button type="button" onclick="coursesByProfessor()">
-Cursos por profesor
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
+<div id="den-chat-window" class="chat-window" aria-live="polite"></div>
+</section>
 </body>
 </html>
