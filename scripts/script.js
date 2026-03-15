@@ -16,39 +16,14 @@ const summary = document.getElementById("summary")
 const tableWrap = document.getElementById("tableWrap")
 const legend = document.getElementById("legend")
 
+const weekTitle = document.getElementById("weekTitle")
+const weekSubtitle = document.getElementById("weekSubtitle")
+
 const downloadICS = document.getElementById("downloadICS")
 
 const denChatWindow = document.getElementById("den-chat-window")
 const chatToggle = document.getElementById("chat-toggle")
 const chatbot = document.getElementById("den-chatbot")
-
-/* =========================
-LOAD DATA
-========================= */
-
-fetch("data/schedule.json")
-.then(r=>{
-if(!r.ok) throw new Error("No se pudo cargar schedule.json")
-return r.json()
-})
-.then(data=>{
-
-schedule = data
-
-schedule.sort((a,b)=>new Date(a.date)-new Date(b.date))
-
-setDefaultWeek()
-updateFilters()
-renderWeek()
-renderLegend()
-showMainMenu()
-
-})
-.catch(err=>{
-console.error(err)
-tableWrap.innerHTML =
-`<div class="empty">Error al cargar los datos del horario.</div>`
-})
 
 /* =========================
 UTILS
@@ -78,7 +53,7 @@ year:"numeric"
 }
 
 /* =========================
-COURSE COLORS AUTO
+COURSE COLORS
 ========================= */
 
 const courseColorMap = {}
@@ -107,6 +82,37 @@ courseColorMap[course] = palette[index]
 return courseColorMap[course]
 
 }
+
+/* =========================
+LOAD DATA
+========================= */
+
+fetch("data/schedule.json")
+.then(r=>{
+if(!r.ok) throw new Error("No se pudo cargar schedule.json")
+return r.json()
+})
+.then(data=>{
+
+schedule = data
+
+schedule.sort((a,b)=>new Date(a.date)-new Date(b.date))
+
+updateFilters()
+setDefaultWeek()
+updateFilters()
+renderWeek()
+
+if(typeof showMainMenu==="function"){
+showMainMenu()
+}
+
+})
+.catch(err=>{
+console.error(err)
+tableWrap.innerHTML =
+`<div class="empty">Error al cargar los datos del horario.</div>`
+})
 
 /* =========================
 DEFAULT WEEK
@@ -140,17 +146,21 @@ FILTERS
 function updateFilters(){
 
 const week = weekSelector.value
-let prof = profSelector.value
-let course = courseSelector.value
+let prof = profSelector.value || "all"
+let course = courseSelector.value || "all"
 
 let base = schedule
 
 if(week!=="all")
 base = base.filter(e=>mondayOf(e.date)===week)
 
+/* PROF BASE */
+
 let profBase = base
 if(course!=="all")
 profBase = profBase.filter(e=>e.course===course)
+
+/* COURSE BASE */
 
 let courseBase = base
 if(prof!=="all"){
@@ -183,9 +193,13 @@ courses.map(c=>`<option value="${c}">${c}</option>`).join("")
 
 if(profSelector.querySelector(`option[value="${prof}"]`))
 profSelector.value = prof
+else
+profSelector.value = "all"
 
 if(courseSelector.querySelector(`option[value="${course}"]`))
 courseSelector.value = course
+else
+courseSelector.value = "all"
 
 }
 
@@ -195,10 +209,10 @@ SUMMARY
 
 function renderSummary(rows){
 
-const classes = rows.filter(r=>
-!r.course.toLowerCase().includes("evaluacion") &&
-!r.course.toLowerCase().includes("induccion")
-).length
+const classes = rows.filter(r=>{
+const c = r.course.toLowerCase()
+return !c.includes("evaluacion") && !c.includes("induccion")
+}).length
 
 const courses = new Set(rows.map(r=>r.course)).size
 const profs = new Set(rows.map(r=>r.professor).filter(Boolean)).size
@@ -230,6 +244,43 @@ summary.innerHTML =
 }
 
 /* =========================
+LEGEND
+========================= */
+
+function renderLegend(rows=[]){
+
+const uniqueCourses = [...new Set(rows.map(e=>e.course))]
+
+legend.innerHTML = uniqueCourses
+.map(course=>`
+<span class="badge ${getCourseColor(course)} legend-course" data-course="${course}">
+${course}
+</span>
+`)
+.join("")
+
+document.querySelectorAll(".legend-course").forEach(badge=>{
+
+badge.addEventListener("click",()=>{
+
+const clickedCourse = badge.dataset.course
+
+if(courseSelector.value===clickedCourse){
+courseSelector.value="all"
+}else{
+courseSelector.value=clickedCourse
+}
+
+updateFilters()
+renderWeek()
+
+})
+
+})
+
+}
+
+/* =========================
 RENDER WEEK
 ========================= */
 
@@ -238,6 +289,25 @@ function renderWeek(){
 const week = weekSelector.value
 const prof = profSelector.value
 const course = courseSelector.value
+
+if(week==="all"){
+
+weekTitle.textContent="Programación completa"
+weekSubtitle.textContent="Todas las semanas del semestre"
+
+}else{
+
+const monday = new Date(week+"T00:00:00")
+const friday = new Date(monday)
+friday.setDate(monday.getDate()+4)
+
+const start = monday.toLocaleDateString("es-CL",{day:"numeric",month:"long"})
+const end = friday.toLocaleDateString("es-CL",{day:"numeric",month:"long",year:"numeric"})
+
+weekTitle.textContent=`Semana ${start} – ${end}`
+weekSubtitle.textContent="Actividades registradas en la planificación"
+
+}
 
 const rows = schedule
 .filter(e=>week==="all"||mondayOf(e.date)===week)
@@ -250,17 +320,18 @@ return e.professor===prof
 .sort((a,b)=>new Date(a.date)-new Date(b.date))
 
 renderSummary(rows)
+renderLegend(rows)
 
 if(!rows.length){
 
-tableWrap.innerHTML =
+tableWrap.innerHTML=
 `<div class="empty">No hay actividades.</div>`
 
 return
 
 }
 
-tableWrap.innerHTML =
+tableWrap.innerHTML=
 
 `
 <table>
@@ -289,7 +360,8 @@ ${rows.map(r=>`
 </td>
 
 <td data-label="Curso">
-<span class="badge ${getCourseColor(r.course)}">${r.course}</span></td>
+<span class="badge ${getCourseColor(r.course)}">${r.course}</span>
+</td>
 
 <td data-label="Profesor">${r.professor||"-"}</td>
 
@@ -308,51 +380,6 @@ ${rows.map(r=>`
 }
 
 /* =========================
-LEGEND
-========================= */
-
-
-function renderLegend(){
-
-const uniqueCourses = [...new Set(schedule.map(e => e.course))]
-
-legend.innerHTML = uniqueCourses
-.map(course => `
-<span class="badge ${getCourseColor(course)} legend-course"
-data-course="${course}">
-${course}
-</span>
-`)
-.join("")
-
-document.querySelectorAll(".legend-course").forEach(badge => {
-
-badge.addEventListener("click", () => {
-
-const course = badge.dataset.course
-
-/* marcar badge activo */
-
-document.querySelectorAll(".legend-course")
-.forEach(b => b.classList.remove("active"))
-
-badge.classList.add("active")
-
-/* sincronizar selector */
-
-courseSelector.value = course
-
-/* render directo */
-
-renderWeek()
-
-})
-
-})
-
-}
-
-/* =========================
 ICS GENERATOR
 ========================= */
 
@@ -360,12 +387,12 @@ function formatICSDate(date,time,isEnd=false){
 
 if(!time) return null
 
-const block = (time.split("·")[0] || time)
-const parts = block.split("-")
+const block=(time.split("·")[0]||time)
+const parts=block.split("-")
 
 if(parts.length<2) return null
 
-let t = isEnd ? parts[1] : parts[0]
+let t=isEnd?parts[1]:parts[0]
 t=t.trim()
 
 const [h,m]=t.split(":")
@@ -383,8 +410,8 @@ PRODID:-//DEN//Horario 2026//ES
 
 schedule.forEach((ev,i)=>{
 
-const start = formatICSDate(ev.date,ev.time,false)
-const end = formatICSDate(ev.date,ev.time,true)
+const start=formatICSDate(ev.date,ev.time,false)
+const end=formatICSDate(ev.date,ev.time,true)
 
 if(!start||!end) return
 
@@ -404,8 +431,8 @@ END:VEVENT
 
 ics+=`\nEND:VCALENDAR`
 
-const blob = new Blob([ics],{type:"text/calendar"})
-const url = URL.createObjectURL(blob)
+const blob=new Blob([ics],{type:"text/calendar"})
+const url=URL.createObjectURL(blob)
 
 const a=document.createElement("a")
 a.href=url
@@ -419,24 +446,18 @@ EVENTS
 ========================= */
 
 weekSelector.addEventListener("change",()=>{
-
 updateFilters()
 renderWeek()
-
 })
 
 profSelector.addEventListener("change",()=>{
-
 updateFilters()
 renderWeek()
-
 })
 
 courseSelector.addEventListener("change",()=>{
-
 updateFilters()
 renderWeek()
-
 })
 
 downloadICS.addEventListener("click",generateICS)
@@ -446,6 +467,8 @@ CHATBOT
 ========================= */
 
 function showMainMenu(){
+
+if(!denChatWindow) return
 
 denChatWindow.innerHTML=`
 
@@ -461,6 +484,7 @@ denChatWindow.innerHTML=`
 <button onclick="coursesByProfessor()">Cursos por profesor</button>
 
 </div>
+
 `
 
 }
@@ -491,63 +515,6 @@ Horario: ${e.time}<br><br>
 })
 
 denChatWindow.innerHTML=html
-
-}
-
-function nextClassToday(){
-
-const today=new Date().toISOString().slice(0,10)
-const events=schedule.filter(e=>e.date===today)
-
-showAnswer(events)
-
-}
-
-function nextClassWeek(){
-
-const today=new Date()
-const weekday=(today.getDay()+6)%7
-today.setDate(today.getDate()-weekday)
-
-const monday=today.toISOString().slice(0,10)
-
-const events=schedule.filter(e=>mondayOf(e.date)===monday)
-
-showAnswer(events)
-
-}
-
-function nextClassGlobal(){
-
-const today=new Date().toISOString().slice(0,10)
-
-const future=schedule
-.filter(e=>e.date>=today)
-.sort((a,b)=>new Date(a.date)-new Date(b.date))
-
-if(!future.length) showAnswer([])
-else showAnswer([future[0]])
-
-}
-
-function coursesByProfessor(){
-
-const profs=[...new Set(schedule.map(e=>e.professor).filter(Boolean))]
-
-let html=`<button onclick="showMainMenu()">← Volver</button><br><br>`
-
-profs.forEach(p=>{
-html+=`<button onclick="showProfessorCourses('${p}')">${p}</button><br>`
-})
-
-denChatWindow.innerHTML=html
-
-}
-
-function showProfessorCourses(p){
-
-const events=schedule.filter(e=>e.professor===p)
-showAnswer(events)
 
 }
 
