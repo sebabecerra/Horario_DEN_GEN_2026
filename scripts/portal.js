@@ -9,22 +9,16 @@ const dom = {}
 
 document.addEventListener("DOMContentLoaded", () => {
   dom.facultyGrid = document.getElementById("facultyGrid")
-  dom.coursesGrid = document.getElementById("coursesGrid")
   dom.showAllFaculty = document.getElementById("showAllFaculty")
-  dom.showAllCourses = document.getElementById("showAllCourses")
 
   dom.showAllFaculty.addEventListener("click", () => {
     app?.setFilter("professor", "all")
-  })
-  dom.showAllCourses.addEventListener("click", () => {
-    app?.setFilter("course", "all")
   })
 
   if(window.DENApp){
     app = window.DENApp
     app.subscribe(snapshot => {
       renderFaculty(snapshot)
-      renderCourses(snapshot)
     })
   }
 })
@@ -89,70 +83,6 @@ function renderFaculty(snapshot = app?.getState()){
 
     card.append(header, meta, actions)
     dom.facultyGrid.appendChild(card)
-  })
-}
-
-function renderCourses(snapshot = app?.getState()){
-  if(!snapshot || !dom.coursesGrid){
-    return
-  }
-
-  const selectedProfessor = snapshot.filters.professor
-  const selectedCourse = snapshot.filters.course
-
-  let courses = [...new Set(snapshot.schedule.map(item => item.course))]
-
-  if(selectedProfessor !== "all" && selectedProfessor !== "sin_profesor"){
-    courses = [...new Set(
-      snapshot.schedule
-        .filter(item => item.professor === selectedProfessor)
-        .map(item => item.course)
-    )]
-  }
-
-  dom.coursesGrid.innerHTML = ""
-
-  courses.forEach(course => {
-    const items = snapshot.schedule.filter(item => item.course === course)
-    const professors = [...new Set(items.map(item => item.professor).filter(Boolean))]
-    const card = document.createElement("article")
-    card.className = "info-card"
-
-    const header = document.createElement("div")
-    header.className = "info-card-head"
-
-    const title = document.createElement("h3")
-    title.textContent = course
-
-    if(selectedCourse === course){
-      const pill = document.createElement("span")
-      pill.className = "mini-pill"
-      pill.textContent = "Activo"
-      header.append(title, pill)
-    } else {
-      header.appendChild(title)
-    }
-
-    const meta = document.createElement("p")
-    meta.className = "muted-copy"
-    meta.textContent = professors.length
-      ? professors.join(" | ")
-      : "Sin profesor asignado"
-
-    const actions = document.createElement("div")
-    actions.className = "card-actions"
-
-    const viewButton = document.createElement("button")
-    viewButton.type = "button"
-    viewButton.className = "text-btn"
-    viewButton.textContent = "Ver horario"
-    viewButton.addEventListener("click", () => {
-      app.setFilter("course", course)
-    })
-
-    actions.appendChild(viewButton)
-    card.append(header, meta, actions)
-    dom.coursesGrid.appendChild(card)
   })
 }
 })()
