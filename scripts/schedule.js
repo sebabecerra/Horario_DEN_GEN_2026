@@ -125,6 +125,7 @@ function normalizeEvent(item){
     professor,
     location,
     time,
+    specialChange: typeof item.specialChange === "string" ? item.specialChange.trim() : "",
     timeBlocks: blocks,
     hasProfessor: Boolean(professor),
     sortStart: blocks[0]?.start ?? "99:99"
@@ -416,11 +417,14 @@ function renderTable(rows){
 
 function renderRow(row){
   const tr = document.createElement("tr")
+  if(row.specialChange){
+    tr.classList.add("row-special-change")
+  }
   tr.appendChild(renderDateCell(row.date))
   tr.appendChild(renderCourseCell(row.course))
   tr.appendChild(renderProfessorCell(row.professor))
   tr.appendChild(renderTextCell("Horario", row.time || "Sin bloque horario"))
-  tr.appendChild(renderTextCell("Sala / modalidad", row.location || "Por definir"))
+  tr.appendChild(renderLocationCell(row))
   return tr
 }
 
@@ -505,6 +509,24 @@ function renderTextCell(label, value){
   const td = document.createElement("td")
   td.dataset.label = label
   td.textContent = value
+  return td
+}
+
+function renderLocationCell(row){
+  const td = document.createElement("td")
+  td.dataset.label = "Sala / modalidad"
+
+  const value = document.createElement("div")
+  value.textContent = row.location || "Por definir"
+  td.appendChild(value)
+
+  if(row.specialChange){
+    const note = document.createElement("div")
+    note.className = "special-change-note"
+    note.textContent = row.specialChange
+    td.appendChild(note)
+  }
+
   return td
 }
 
@@ -596,7 +618,8 @@ function downloadCalendar(){
 
 function buildDescription(event){
   const professor = event.professor || "Sin profesor asignado"
-  return `Profesor: ${professor} | Horario: ${event.time || "Por definir"}`
+  const specialChange = event.specialChange ? ` | Nota: ${event.specialChange}` : ""
+  return `Profesor: ${professor} | Horario: ${event.time || "Por definir"}${specialChange}`
 }
 
 function toICSDateTime(date, time){

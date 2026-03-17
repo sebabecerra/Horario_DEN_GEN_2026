@@ -343,6 +343,10 @@ tbody tr{
 background:#fff;
 }
 
+tbody tr.row-special-change{
+background:linear-gradient(180deg, #fff7eb 0%, #ffffff 100%);
+}
+
 tbody td{
 padding:16px;
 border-bottom:1px solid #edf2f7;
@@ -368,6 +372,18 @@ font-size:.92rem;
 margin-top:18px;
 font-size:.92rem;
 color:var(--muted);
+}
+
+.special-change-note{
+margin-top:8px;
+display:inline-flex;
+padding:6px 10px;
+border-radius:999px;
+background:#fff1da;
+color:#9a5a00;
+font-size:.78rem;
+font-weight:800;
+line-height:1.3;
 }
 
 .badge{
