@@ -43,6 +43,7 @@ function init(){
   cacheDom()
   bindEvents()
   fetchSchedule()
+  window.addEventListener("popstate", syncStateFromUrl)
 }
 
 function cacheDom(){
@@ -53,6 +54,7 @@ function cacheDom(){
   dom.resetFilters = document.getElementById("resetFilters")
   dom.downloadICS = document.getElementById("downloadICS")
   dom.summary = document.getElementById("summary")
+  dom.activeFilters = document.getElementById("activeFilters")
   dom.weekTitle = document.getElementById("weekTitle")
   dom.weekSubtitle = document.getElementById("weekSubtitle")
   dom.legend = document.getElementById("legend")
@@ -103,6 +105,7 @@ function fetchSchedule(){
         .sort((a, b) => a.date.localeCompare(b.date) || a.sortStart.localeCompare(b.sortStart))
 
       state.filters.week = getDefaultWeek()
+      hydrateFiltersFromUrl()
       renderSelectors()
       syncDependentFilters()
       render()
@@ -141,18 +144,59 @@ function parseTimeBlocks(timeLabel){
     .split("·")
     .map(part => part.trim())
     .map(part => {
-      const match = part.match(/^(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})$/)
+      const match = part.match(/^(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/)
       if(!match){
         return null
       }
 
+      const start = normalizeTimeValue(match[1])
+      const end = normalizeTimeValue(match[2])
+
       return {
-        start: match[1],
-        end: match[2],
-        label: `${match[1]} - ${match[2]}`
+        start,
+        end,
+        label: `${start} - ${end}`
       }
     })
     .filter(Boolean)
+}
+
+function normalizeTimeValue(time){
+  const [hours, minutes] = String(time).split(":")
+  return `${String(hours).padStart(2, "0")}:${minutes}`
+}
+
+function getBlockDurationMinutes(block){
+  const [startHour, startMinute] = block.start.split(":").map(Number)
+  const [endHour, endMinute] = block.end.split(":").map(Number)
+  return (endHour * 60 + endMinute) - (startHour * 60 + startMinute)
+}
+
+function getEventDurationMinutes(event){
+  return event.timeBlocks.reduce((total, block) => total + getBlockDurationMinutes(block), 0)
+}
+
+function formatDurationLabel(totalMinutes){
+  if(!totalMinutes){
+    return "0 h"
+  }
+
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+
+  if(!minutes){
+    return `${hours} h`
+  }
+
+  return `${hours} h ${minutes} min`
+}
+
+function formatShareLabel(totalMinutes, grandTotalMinutes){
+  const percentage = grandTotalMinutes
+    ? Math.round((totalMinutes / grandTotalMinutes) * 100)
+    : 0
+
+  return `${percentage}%`
 }
 
 function formatLocalDate(date){
@@ -315,29 +359,71 @@ function createOption(value, label){
 function render(){
   const rows = getVisibleEvents()
   renderSummary(rows)
+  renderActiveFilters()
   renderHeading(rows)
   renderLegend(rows)
   renderTable(rows)
+  updateUrl()
   notifySubscribers(rows)
 }
 
 function renderSummary(rows){
-  const totalClasses = rows.filter(row => !isSpecialActivity(row.course)).length
   const totalCourses = new Set(rows.map(row => row.course)).size
   const totalProfessors = new Set(rows.map(row => row.professor).filter(Boolean)).size
   const totalLocations = new Set(rows.map(row => normalizeLocationLabel(row.location))).size
+  const totalBlocks = rows.reduce((sum, row) => sum + row.timeBlocks.length, 0)
+  const totalMinutes = rows.reduce((sum, row) => sum + getEventDurationMinutes(row), 0)
+  const totalInPersonMinutes = rows.reduce((sum, row) =>
+    sum + (isOnlineLocation(row.location) ? 0 : getEventDurationMinutes(row)), 0
+  )
+  const totalOnlineMinutes = rows.reduce((sum, row) =>
+    sum + (isOnlineLocation(row.location) ? getEventDurationMinutes(row) : 0), 0
+  )
 
   dom.summary.innerHTML = ""
 
   ;[
-    { value: rows.length, label: "actividades visibles" },
-    { value: totalClasses, label: "clases formales" },
-    { value: totalCourses, label: "cursos activos" },
-    { value: totalProfessors, label: "profesores visibles" },
-    { value: totalLocations, label: "salas o modalidades" }
+    {
+      value: rows.length,
+      label: "actividades",
+      helper: "Eventos en la vista actual",
+      onClick: resetFilters
+    },
+    {
+      value: formatDurationLabel(totalMinutes),
+      label: "horas efectivas",
+      helper: `Presencial ${formatShareLabel(totalInPersonMinutes, totalMinutes)} · Online ${formatShareLabel(totalOnlineMinutes, totalMinutes)}`,
+      onClick: () => setFilter("week", "all")
+    },
+    {
+      value: totalCourses,
+      label: "cursos",
+      helper: "Cursos distintos en pantalla",
+      onClick: () => setFilter("course", "all")
+    },
+    {
+      value: totalProfessors,
+      label: "profesores",
+      helper: "Docentes con clases visibles",
+      onClick: () => setFilter("professor", "all")
+    },
+    {
+      value: totalBlocks,
+      label: "bloques",
+      helper: "Tramos horarios en pantalla",
+      onClick: () => setFilter("week", "all")
+    },
+    {
+      value: totalLocations,
+      label: "salas",
+      helper: "Salas o modalidades distintas",
+      onClick: resetFilters
+    }
   ].forEach(item => {
-    const card = document.createElement("article")
-    card.className = "sum-card"
+    const card = document.createElement("button")
+    card.type = "button"
+    card.className = "sum-card summary-action"
+    card.addEventListener("click", item.onClick)
 
     const number = document.createElement("div")
     number.className = "k"
@@ -347,9 +433,72 @@ function renderSummary(rows){
     label.className = "v"
     label.textContent = item.label
 
-    card.append(number, label)
+    const helper = document.createElement("div")
+    helper.className = "sum-helper"
+    helper.textContent = item.helper
+
+    card.append(number, label, helper)
     dom.summary.appendChild(card)
   })
+}
+
+function renderActiveFilters(){
+  dom.activeFilters.innerHTML = ""
+
+  const items = getActiveFilterItems()
+  if(!items.length){
+    dom.activeFilters.classList.remove("is-visible")
+    return
+  }
+
+  dom.activeFilters.classList.add("is-visible")
+
+  items.forEach(item => {
+    const chip = document.createElement("button")
+    chip.type = "button"
+    chip.className = "filter-chip"
+    chip.textContent = `${item.label}: ${item.value} ×`
+    chip.addEventListener("click", item.clear)
+    dom.activeFilters.appendChild(chip)
+  })
+}
+
+function getActiveFilterItems(){
+  const items = []
+
+  if(state.filters.week !== "all"){
+    items.push({
+      label: "Semana",
+      value: getWeekLabel(state.filters.week),
+      clear: () => setFilter("week", "all")
+    })
+  }
+
+  if(state.filters.professor !== "all"){
+    items.push({
+      label: "Profesor",
+      value: state.filters.professor === "sin_profesor" ? "Sin profesor asignado" : state.filters.professor,
+      clear: () => setFilter("professor", "all")
+    })
+  }
+
+  if(state.filters.course !== "all"){
+    items.push({
+      label: "Curso",
+      value: state.filters.course,
+      clear: () => setFilter("course", "all")
+    })
+  }
+
+  if(state.filters.query){
+    items.push({
+      label: "Búsqueda",
+      value: state.filters.query,
+      clear: () => applySearchQuery("")
+    })
+  }
+
+  return items
 }
 
 function renderHeading(rows){
@@ -386,10 +535,7 @@ function renderTable(rows){
   dom.tableWrap.innerHTML = ""
 
   if(!rows.length){
-    const empty = document.createElement("div")
-    empty.className = "empty"
-    empty.textContent = "No hay actividades que coincidan con los filtros actuales."
-    dom.tableWrap.appendChild(empty)
+    renderEmptyState()
     return
   }
 
@@ -512,12 +658,38 @@ function renderTextCell(label, value){
   return td
 }
 
+function renderEmptyState(){
+  const empty = document.createElement("div")
+  empty.className = "empty"
+
+  const title = document.createElement("strong")
+  title.className = "empty-title"
+  title.textContent = "No hay resultados para esta combinación de filtros."
+
+  const copy = document.createElement("p")
+  copy.className = "empty-copy"
+  copy.textContent = "Prueba con otra semana, elimina la búsqueda actual o vuelve a ver toda la programación."
+
+  const actions = document.createElement("div")
+  actions.className = "empty-actions"
+
+  const resetButton = document.createElement("button")
+  resetButton.type = "button"
+  resetButton.className = "secondary-btn"
+  resetButton.textContent = "Ver toda la programación"
+  resetButton.addEventListener("click", resetFilters)
+
+  actions.appendChild(resetButton)
+  empty.append(title, copy, actions)
+  dom.tableWrap.appendChild(empty)
+}
+
 function renderLocationCell(row){
   const td = document.createElement("td")
   td.dataset.label = "Sala / modalidad"
 
   const value = document.createElement("div")
-  value.textContent = row.location || "Por definir"
+  value.textContent = normalizeLocationLabel(row.location)
   td.appendChild(value)
 
   if(row.specialChange){
@@ -568,7 +740,26 @@ function isSpecialActivity(course){
 }
 
 function normalizeLocationLabel(location){
-  return location || "Por definir"
+  if(!location){
+    return "Por definir"
+  }
+
+  if(isOnlineLocation(location)){
+    return "Clases online"
+  }
+
+  return location
+}
+
+function isOnlineLocation(location){
+  const normalized = normalizeSearchText(location).replace(/[^a-z0-9]/g, "")
+  return normalized.includes("online") || normalized.includes("remoto")
+}
+
+function applySearchQuery(value){
+  state.filters.query = value
+  syncDependentFilters()
+  render()
 }
 
 function getCourseColor(course){
@@ -619,7 +810,7 @@ function downloadCalendar(){
 function buildDescription(event){
   const professor = event.professor || "Sin profesor asignado"
   const specialChange = event.specialChange ? ` | Nota: ${event.specialChange}` : ""
-  return `Profesor: ${professor} | Horario: ${event.time || "Por definir"}${specialChange}`
+  return `Profesor: ${professor} | Horario: ${event.time || "Por definir"} | Lugar: ${normalizeLocationLabel(event.location)}${specialChange}`
 }
 
 function toICSDateTime(date, time){
@@ -640,17 +831,63 @@ function notifySubscribers(rows){
   state.subscribers.forEach(listener => listener(snapshot))
 }
 
+function hydrateFiltersFromUrl(){
+  const params = new URLSearchParams(window.location.search)
+  state.filters.week = params.get("week") || state.filters.week
+  state.filters.professor = params.get("professor") || state.filters.professor
+  state.filters.course = params.get("course") || state.filters.course
+  state.filters.query = params.get("q") || ""
+}
+
+function syncStateFromUrl(){
+  hydrateFiltersFromUrl()
+  syncDependentFilters()
+  render()
+}
+
+function updateUrl(){
+  const params = new URLSearchParams()
+
+  if(state.filters.week !== "all"){
+    params.set("week", state.filters.week)
+  }
+
+  if(state.filters.professor !== "all"){
+    params.set("professor", state.filters.professor)
+  }
+
+  if(state.filters.course !== "all"){
+    params.set("course", state.filters.course)
+  }
+
+  if(state.filters.query){
+    params.set("q", state.filters.query)
+  }
+
+  const queryString = params.toString()
+  const nextUrl = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname
+
+  if(nextUrl !== `${window.location.pathname}${window.location.search}`){
+    window.history.replaceState({}, "", nextUrl)
+  }
+}
+
 function getSnapshot(rows = getVisibleEvents()){
+  const professorScopeEvents = getVisibleEvents({ ...state.filters, professor: "all" })
+
   return {
     filters: { ...state.filters },
     schedule: [...state.schedule],
     visibleEvents: [...rows],
+    professorScopeEvents: [...professorScopeEvents],
     scholarLinks: { ...scholarLinks },
     helpers: {
       formatLocalDate,
       mondayOf,
       prettyDate,
       shortDate,
+      getEventDurationMinutes,
+      formatDurationLabel,
       getCourseColor,
       getWeekLabel
     }

@@ -4,17 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Horario DEN 2026 | Doctorado en Economía y Negocios UDD</title>
-<link rel="stylesheet" href="styles/styles.css">
-<script src="scripts/schedule.js" defer></script>
-<script src="scripts/portal.js" defer></script>
-<script src="scripts/chatbot.js" defer></script>
+<link rel="stylesheet" href="styles/styles.css?v=20260322bc">
+<script src="scripts/schedule.js?v=20260322bc" defer></script>
+<script src="scripts/portal.js?v=20260322bc" defer></script>
+<script src="scripts/chatbot.js?v=20260322bc" defer></script>
 </head>
 <body>
 <main class="container">
 <section class="hero">
 <div class="hero-copy">
+<div class="hero-brand">
+<img class="hero-logo" src="logo_clean.png" alt="Logo UDD Negocios">
+<div class="hero-brand-copy">
 <p class="eyebrow">Doctorado en Economía y Negocios</p>
 <h1>Horario académico DEN 2026</h1>
+</div>
+</div>
 <p class="hero-text">
 Consulta clases, inducciones y evaluaciones desde una sola vista. El horario se
 actualiza desde la base de datos local y permite filtrar por semana, profesor,
@@ -31,14 +36,24 @@ curso o búsqueda libre.
 <strong>Vista académica</strong>
 <span>Profesores, salas y bloques</span>
 </article>
-<article class="meta-card">
-<strong>Exportable</strong>
-<span>Calendario `.ics` compatible</span>
-</article>
+<div class="meta-download-wrap">
+<button id="downloadICS" class="meta-download" type="button">Descargar calendario</button>
+</div>
 </div>
 </section>
 
 <section class="workspace" aria-label="Panel de horario académico">
+<section class="panel panel-compact faculty-band">
+<header class="side-head">
+<div>
+<p class="section-label">Cuerpo académico</p>
+<h2>Claustro DEN</h2>
+<p>Equipo académico oficial del programa con vínculo al horario cuando corresponde.</p>
+</div>
+</header>
+<div id="facultyGrid" class="faculty-band"></div>
+</section>
+
 <div class="toolbar">
 <div class="control">
 <label for="weekSelector">Semana</label>
@@ -70,13 +85,10 @@ autocomplete="off"
 <button id="resetFilters" class="secondary-btn" type="button">
 Limpiar filtros
 </button>
-<button id="downloadICS" class="primary-btn" type="button">
-Descargar calendario (.ics)
-</button>
 </div>
 </div>
 
-<section class="summary" id="summary" aria-live="polite"></section>
+<section class="active-filters" id="activeFilters" aria-live="polite"></section>
 
 <div class="content-grid">
 <section class="panel schedule-panel">
@@ -95,28 +107,20 @@ Descargar calendario (.ics)
 Incluye inducciones y evaluaciones cuando aparecen en la planificación académica.
 </footer>
 </section>
+</div>
 
-<aside class="sidebar">
-<section class="panel panel-compact">
-<header class="side-head">
-<div>
-<p class="section-label">Profesores</p>
-<h2>Claustro docente</h2>
-</div>
-<button id="showAllFaculty" class="text-btn" type="button">Ver todos</button>
-</header>
-<div id="facultyGrid" class="stack-list"></div>
-</section>
-</aside>
-</div>
+<section class="summary" id="summary" aria-live="polite"></section>
 </section>
 </main>
 
 <section id="den-chatbot" class="chatbot minimized" aria-label="Asistente del horario">
 <header class="chat-header">
+<div class="chat-brand">
+<img class="chat-logo" src="logo_clean.png" alt="Logo UDD Negocios">
 <div>
 <span class="chat-title">HorarioBot</span>
 <p class="chat-subtitle">Consultas rápidas del calendario</p>
+</div>
 </div>
 <button
 id="chat-toggle"

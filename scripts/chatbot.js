@@ -173,7 +173,7 @@ function renderEvents(title, events){
 
     const action = document.createElement("button")
     action.type = "button"
-    action.className = "text-btn"
+    action.className = "chat-inline-btn"
     action.textContent = "Aplicar filtros"
     action.addEventListener("click", () => {
       app.setFilter("week", snapshot.helpers.mondayOf(event.date))
@@ -193,7 +193,7 @@ function renderEvents(title, events){
 function createBackButton(){
   const button = document.createElement("button")
   button.type = "button"
-  button.className = "text-btn"
+  button.className = "chat-inline-btn"
   button.textContent = "← Volver"
   button.addEventListener("click", renderMenu)
   return button
