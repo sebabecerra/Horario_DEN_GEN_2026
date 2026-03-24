@@ -124,10 +124,10 @@
   "location": "SALA AI-533 / SALA AI-532"
 },
 {
-  "date": "2026-04-06",
+  "date": "2026-04-07",
   "course": "Management - DEN3C113",
   "professor": "Luis Torres",
-  "time": "8:30 - 12:20 · 12:30 - 13:40",
+  "time": "09:00 - 13:00",
   "location": "On line",
   "specialChange": "Clase online por situación especial del profesor"
 },
@@ -135,16 +135,16 @@
   "date": "2026-04-13",
   "course": "Management - DEN3C113",
   "professor": "Luis Torres",
-  "time": "8:30 - 12:20 · 12:30 - 13:40",
-  "location": "On line",
+  "time": "09:00 - 13:00",
+  "location": "Microsoft Teams Meeting",
   "specialChange": "Clase online por situación especial del profesor"
 },
 {
-  "date": "2026-04-20",
+  "date": "2026-04-22",
   "course": "Management - DEN3C113",
   "professor": "Luis Torres",
-  "time": "8:30 - 11:00 · 11:10 - 13:40",
-  "location": "On line",
+  "time": "09:00 - 13:00",
+  "location": "Microsoft Teams Meeting",
   "specialChange": "Clase online por situación especial del profesor"
 },
 
