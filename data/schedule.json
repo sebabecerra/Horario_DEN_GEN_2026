@@ -147,6 +147,13 @@
   "location": "Microsoft Teams Meeting",
   "specialChange": "Clase online por situación especial del profesor"
 },
+{
+  "date": "2026-05-29",
+  "course": "Evaluación Management - DEN3C113",
+  "professor": "Luis Torres",
+  "time": "",
+  "location": ""
+},
 
 {
   "date": "2026-03-06",
@@ -209,8 +216,8 @@
   "date": "2026-05-05",
   "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
   "professor": "Nélyda Campos",
-  "time": "08:30 - 9:40 · 12:30 - 15:00",
-  "location": "SALA AI-SA404 / SALA AI-SA404"
+  "time": "08:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
 },
 {
   "date": "2026-05-12",
@@ -223,8 +230,8 @@
   "date": "2026-05-19",
   "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
   "professor": "Nélyda Campos",
-  "time": "08:30 - 9:40 · 12:30 - 15:00",
-  "location": "SALA AI-SA404 / SALA AI-SA404"
+  "time": "08:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
 },
 {
   "date": "2026-05-26",
@@ -237,8 +244,8 @@
   "date": "2026-06-02",
   "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
   "professor": "Nélyda Campos",
-  "time": "08:30 - 9:40 · 12:30 - 15:00",
-  "location": "SALA AI-SA404 / SALA AI-SA404"
+  "time": "08:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
 },
 {
   "date": "2026-06-09",
@@ -258,15 +265,15 @@
   "date": "2026-06-23",
   "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
   "professor": "Nélyda Campos",
-  "time": "08:30 - 9:40 · 12:30 - 15:00",
-  "location": "SALA AI-SA404 / SALA AI-SA404"
+  "time": "08:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
 },
 {
   "date": "2026-06-30",
   "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
   "professor": "Nélyda Campos",
-  "time": "08:30 - 9:40 · 12:30 - 15:00",
-  "location": "SALA AI-SA404 / SALA AI-SA404"
+  "time": "08:30 - 11:00 · 11:10 - 13:40",
+  "location": "SALA AI-SE012 Zócalo"
 },
 
 {
