@@ -46,6 +46,7 @@ function renderMenu(){
   buttons.className = "den-buttons"
 
   ;[
+    { label: "Evaluaciones", action: showEvaluations },
     { label: "Clases Semana Pasada", action: showClassesLastWeek },
     { label: "Clases Proxima Semana", action: showClassesNextWeek },
     { label: "Clases Esta Semana", action: showClassesThisWeek },
@@ -104,6 +105,22 @@ function renderWeekEvents(title, monday){
 function isTeachingClass(event){
   const course = String(event.course || "").toLowerCase()
   return !course.includes("inducci") && !course.includes("evaluaci")
+}
+
+function isEvaluation(event){
+  return String(event.course || "").toLowerCase().includes("evaluaci")
+}
+
+function showEvaluations(){
+  if(!snapshot){
+    return
+  }
+
+  const events = snapshot.schedule
+    .filter(isEvaluation)
+    .sort((left, right) => left.date.localeCompare(right.date))
+
+  renderEvents("Evaluaciones", events)
 }
 
 function showProfessors(){
