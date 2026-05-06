@@ -11,6 +11,10 @@ const scholarLinks = {
   "Claudio Aqueveque": "https://scholar.google.com/citations?user=JLauNGgAAAAJ&hl=es"
 }
 
+const courseSyllabusLinks = {
+  "DEN3C112": "syllabi/fundamentos-den3c112-nelyda-campos.pdf"
+}
+
 const palette = [
   "c-blue",
   "c-green",
@@ -568,7 +572,7 @@ function renderRow(row){
   }
   tr.appendChild(renderDateCell(row.date))
   tr.appendChild(renderCourseCell(row.course))
-  tr.appendChild(renderProfessorCell(row.professor))
+  tr.appendChild(renderProfessorCell(row.professor, row.course))
   tr.appendChild(renderTextCell("Horario", row.time || "Sin bloque horario"))
   tr.appendChild(renderLocationCell(row))
   return tr
@@ -600,6 +604,9 @@ function renderCourseCell(course){
   const td = document.createElement("td")
   td.dataset.label = "Curso"
 
+  const wrapper = document.createElement("div")
+  wrapper.className = "course-cell"
+
   const button = document.createElement("button")
   button.type = "button"
   button.className = `badge badge-button ${getCourseColor(course)}`
@@ -610,11 +617,22 @@ function renderCourseCell(course){
     render()
   })
 
-  td.appendChild(button)
+  wrapper.appendChild(button)
+
+  td.appendChild(wrapper)
   return td
 }
 
-function renderProfessorCell(name){
+function getCourseSyllabusLink(course){
+  const match = String(course || "").match(/DEN\d+C\d+/i)
+  if(!match){
+    return ""
+  }
+
+  return courseSyllabusLinks[match[0].toUpperCase()] || ""
+}
+
+function renderProfessorCell(name, course = ""){
   const td = document.createElement("td")
   td.dataset.label = "Profesor"
 
@@ -644,6 +662,17 @@ function renderProfessorCell(name){
     link.target = "_blank"
     link.rel = "noopener noreferrer"
     link.textContent = "Scholar"
+    wrapper.appendChild(link)
+  }
+
+  const syllabusLink = getCourseSyllabusLink(course)
+  if(syllabusLink){
+    const link = document.createElement("a")
+    link.href = syllabusLink
+    link.className = "text-btn professor-trigger professor-syllabus-link"
+    link.target = "_blank"
+    link.rel = "noopener noreferrer"
+    link.textContent = "Syllabus"
     wrapper.appendChild(link)
   }
 

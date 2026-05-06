@@ -303,6 +303,17 @@ color:var(--brand-2);
 text-decoration:none;
 }
 
+.course-cell{
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+gap:8px;
+}
+
+.course-syllabus-link{
+font-size:.82rem;
+}
+
 .text-muted{
 color:var(--muted);
 font-weight:700;
@@ -572,6 +583,10 @@ align-items:center;
 
 .professor-trigger{
 text-align:left;
+}
+
+.professor-syllabus-link{
+color:#ffbf47;
 }
 
 .scholar-link{

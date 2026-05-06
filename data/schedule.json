@@ -255,6 +255,13 @@
   "location": "SALA AI-SE012 Zócalo"
 },
 {
+  "date": "2026-05-26",
+  "course": "Evaluación Fundamentos Económicos de Investigación en Negocios I - DEN3C112 (Escrita 1)",
+  "professor": "Nélyda Campos",
+  "time": "",
+  "location": ""
+},
+{
   "date": "2026-06-02",
   "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
   "professor": "Nélyda Campos",
@@ -276,6 +283,13 @@
   "location": "SALA AI-SE012 Zócalo"
 },
 {
+  "date": "2026-06-16",
+  "course": "Evaluación Fundamentos Económicos de Investigación en Negocios I - DEN3C112 (Escrita 2)",
+  "professor": "Nélyda Campos",
+  "time": "",
+  "location": ""
+},
+{
   "date": "2026-06-23",
   "course": "Fundamentos Económicos de Investigación en Negocios I - DEN3C112",
   "professor": "Nélyda Campos",
@@ -294,7 +308,7 @@
   "date": "2026-05-07",
   "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
   "professor": "Claudio Aqueveque",
-  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "time": "15:00 - 16:10 · 16:20 - 17:30",
   "location": "SALA AI-SE012 Zócalo"
 },
 {
@@ -308,7 +322,7 @@
   "date": "2026-05-14",
   "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
   "professor": "Claudio Aqueveque",
-  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "time": "15:00 - 16:10 · 16:20 - 17:30",
   "location": "SALA AI-SE012 Zócalo"
 },
 {
@@ -323,7 +337,7 @@
   "date": "2026-05-28",
   "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
   "professor": "Claudio Aqueveque",
-  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "time": "15:00 - 16:10 · 16:20 - 17:30",
   "location": "SALA AI-SE012 Zócalo"
 },
 {
@@ -337,7 +351,7 @@
   "date": "2026-06-04",
   "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
   "professor": "Claudio Aqueveque",
-  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "time": "15:00 - 16:10 · 16:20 - 17:30",
   "location": "SALA AI-SE012 Zócalo"
 },
 {
@@ -351,7 +365,7 @@
   "date": "2026-06-11",
   "course": "Métodos Cuantitativos de la Investigación en Negocios - DEN3C111",
   "professor": "Claudio Aqueveque",
-  "time": "13:10 - 14:20 · 14:30 - 15:40",
+  "time": "15:00 - 16:10 · 16:20 - 17:30",
   "location": "SALA AI-SE012 Zócalo"
 },
 {

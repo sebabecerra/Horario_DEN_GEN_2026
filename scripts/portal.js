@@ -6,7 +6,7 @@ DEN Portal – portal.js
 let app = null
 
 const facultyRoster = [
-  { name: "Nélyda Campos", group: "Claustro" },
+  { name: "Nélyda Campos", group: "Claustro", syllabus: "syllabi/fundamentos-den3c112-nelyda-campos.pdf" },
   { name: "Flavia Cardoso", group: "Claustro" },
   { name: "Vesna Mandakovic", group: "Claustro" },
   { name: "Carlos Poblete", group: "Claustro" },
@@ -140,6 +140,16 @@ function renderFacultyCard(snapshot, entry, items, courses, container){
   scholarLink.className = "text-link"
   scholarLink.textContent = "Scholar"
   actions.appendChild(scholarLink)
+
+  if(entry.syllabus){
+    const syllabusLink = document.createElement("a")
+    syllabusLink.href = entry.syllabus
+    syllabusLink.target = "_blank"
+    syllabusLink.rel = "noopener noreferrer"
+    syllabusLink.className = "text-link"
+    syllabusLink.textContent = "Syllabus"
+    actions.appendChild(syllabusLink)
+  }
 
   card.append(top, meta, actions)
   container.appendChild(card)
