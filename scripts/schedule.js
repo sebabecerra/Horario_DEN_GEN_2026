@@ -12,7 +12,9 @@ const scholarLinks = {
 }
 
 const courseSyllabusLinks = {
-  "DEN3C112": "syllabi/fundamentos-den3c112-nelyda-campos.pdf"
+  "DEN3C112": "syllabi/fundamentos-den3c112-nelyda-campos.pdf",
+  "DEN3C113": "syllabi/management-den3c113-luis-torres.pdf",
+  "DEN3C114": "syllabi/research-method-den3c114-carlos-poblete.pdf"
 }
 
 const palette = [
@@ -644,6 +646,9 @@ function renderProfessorCell(name, course = ""){
   const wrapper = document.createElement("div")
   wrapper.className = "professor-cell"
 
+  const topRow = document.createElement("div")
+  topRow.className = "professor-top-row"
+
   const trigger = document.createElement("button")
   trigger.type = "button"
   trigger.className = "text-btn professor-trigger"
@@ -653,7 +658,7 @@ function renderProfessorCell(name, course = ""){
     syncDependentFilters()
     render()
   })
-  wrapper.appendChild(trigger)
+  topRow.appendChild(trigger)
 
   if(scholarLinks[name]){
     const link = document.createElement("a")
@@ -662,8 +667,10 @@ function renderProfessorCell(name, course = ""){
     link.target = "_blank"
     link.rel = "noopener noreferrer"
     link.textContent = "Scholar"
-    wrapper.appendChild(link)
+    topRow.appendChild(link)
   }
+
+  wrapper.appendChild(topRow)
 
   const syllabusLink = getCourseSyllabusLink(course)
   if(syllabusLink){
