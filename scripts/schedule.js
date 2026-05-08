@@ -806,7 +806,19 @@ function buildCalendarLines(events){
     "VERSION:2.0",
     "PRODID:-//DEN//Horario 2026//ES",
     "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH"
+    "METHOD:PUBLISH",
+    "X-WR-CALNAME:Horario DEN 2026",
+    "X-WR-TIMEZONE:America/Santiago",
+    "BEGIN:VTIMEZONE",
+    "TZID:America/Santiago",
+    "X-LIC-LOCATION:America/Santiago",
+    "BEGIN:STANDARD",
+    "TZOFFSETFROM:-0400",
+    "TZOFFSETTO:-0400",
+    "TZNAME:-04",
+    "DTSTART:19700101T000000",
+    "END:STANDARD",
+    "END:VTIMEZONE"
   ]
 
   events.forEach((event, index) => {
@@ -814,9 +826,9 @@ function buildCalendarLines(events){
       event.timeBlocks.forEach((block, blockIndex) => {
         lines.push("BEGIN:VEVENT")
         lines.push(`UID:den-${index}-${blockIndex}@udd.cl`)
-        lines.push(`DTSTAMP:${toICSDateTime(timestampDate, "00:00")}`)
-        lines.push(`DTSTART:${toICSDateTime(event.date, block.start)}`)
-        lines.push(`DTEND:${toICSDateTime(event.date, block.end)}`)
+        lines.push(`DTSTAMP;TZID=America/Santiago:${toICSDateTime(timestampDate, "00:00")}`)
+        lines.push(`DTSTART;TZID=America/Santiago:${toICSDateTime(event.date, block.start)}`)
+        lines.push(`DTEND;TZID=America/Santiago:${toICSDateTime(event.date, block.end)}`)
         lines.push(`SUMMARY:${escapeICS(event.course)}`)
         lines.push(`DESCRIPTION:${escapeICS(buildDescription(event))}`)
         lines.push(`LOCATION:${escapeICS(event.location || "Por definir")}`)
@@ -827,7 +839,7 @@ function buildCalendarLines(events){
 
     lines.push("BEGIN:VEVENT")
     lines.push(`UID:den-${index}-allday@udd.cl`)
-    lines.push(`DTSTAMP:${toICSDateTime(timestampDate, "00:00")}`)
+    lines.push(`DTSTAMP;TZID=America/Santiago:${toICSDateTime(timestampDate, "00:00")}`)
     lines.push(`DTSTART;VALUE=DATE:${event.date.replace(/-/g, "")}`)
     lines.push(`DTEND;VALUE=DATE:${addDays(event.date, 1).replace(/-/g, "")}`)
     lines.push(`SUMMARY:${escapeICS(event.course)}`)
