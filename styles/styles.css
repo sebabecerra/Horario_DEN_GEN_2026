@@ -161,10 +161,37 @@ color:var(--muted);
 
 .meta-download-wrap{
 display:flex;
+flex-wrap:nowrap;
 align-items:center;
 justify-content:flex-start;
+gap:10px;
 min-height:auto;
 padding-top:18px;
+}
+
+.meta-subscribe{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+flex:1 1 0;
+min-height:48px;
+padding:14px 24px;
+border-radius:4px;
+background:linear-gradient(180deg, #ffbf2f, #e19a00);
+color:#111111;
+font-size:.96rem;
+font-weight:800;
+text-decoration:none;
+transition:transform .16s ease, box-shadow .16s ease, background .16s ease;
+border:0;
+}
+
+.meta-subscribe:hover,
+.meta-subscribe:focus-visible{
+background:linear-gradient(180deg, #ffc94c, #eba40f);
+color:#111111;
+transform:translateY(-1px);
+box-shadow:0 8px 16px rgba(0,0,0,.18);
 }
 
 .meta-download{
@@ -172,6 +199,7 @@ margin-top:0;
 display:inline-flex;
 align-items:center;
 justify-content:center;
+flex:1 1 0;
 min-height:48px;
 padding:14px 24px;
 border-radius:4px;

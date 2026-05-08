@@ -60,6 +60,7 @@ function cacheDom(){
   dom.searchInput = document.getElementById("searchInput")
   dom.resetFilters = document.getElementById("resetFilters")
   dom.downloadICS = document.getElementById("downloadICS")
+  dom.subscribeICS = document.getElementById("subscribeICS")
   dom.summary = document.getElementById("summary")
   dom.activeFilters = document.getElementById("activeFilters")
   dom.weekTitle = document.getElementById("weekTitle")
@@ -95,6 +96,9 @@ function bindEvents(){
 
   dom.resetFilters.addEventListener("click", resetFilters)
   dom.downloadICS.addEventListener("click", downloadCalendar)
+  if(dom.subscribeICS){
+    dom.subscribeICS.href = getCalendarSubscriptionUrl()
+  }
 }
 
 function fetchSchedule(){
@@ -575,7 +579,7 @@ function renderRow(row){
   }
   tr.appendChild(renderDateCell(row.date))
   tr.appendChild(renderCourseCell(row.course))
-  tr.appendChild(renderProfessorCell(row.professor, row.course))
+  tr.appendChild(renderProfessorCell(row.professor))
   tr.appendChild(renderTextCell("Horario", row.time || "Sin bloque horario"))
   tr.appendChild(renderLocationCell(row))
   return tr
@@ -635,7 +639,7 @@ function getCourseSyllabusLink(course){
   return courseSyllabusLinks[match[0].toUpperCase()] || ""
 }
 
-function renderProfessorCell(name, course = ""){
+function renderProfessorCell(name){
   const td = document.createElement("td")
   td.dataset.label = "Profesor"
 
@@ -647,9 +651,6 @@ function renderProfessorCell(name, course = ""){
   const wrapper = document.createElement("div")
   wrapper.className = "professor-cell"
 
-  const topRow = document.createElement("div")
-  topRow.className = "professor-top-row"
-
   const trigger = document.createElement("button")
   trigger.type = "button"
   trigger.className = "text-btn professor-trigger"
@@ -659,30 +660,7 @@ function renderProfessorCell(name, course = ""){
     syncDependentFilters()
     render()
   })
-  topRow.appendChild(trigger)
-
-  if(scholarLinks[name]){
-    const link = document.createElement("a")
-    link.href = scholarLinks[name]
-    link.className = "scholar-link"
-    link.target = "_blank"
-    link.rel = "noopener noreferrer"
-    link.textContent = "Scholar"
-    topRow.appendChild(link)
-  }
-
-  wrapper.appendChild(topRow)
-
-  const syllabusLink = getCourseSyllabusLink(course)
-  if(syllabusLink){
-    const link = document.createElement("a")
-    link.href = syllabusLink
-    link.className = "text-btn professor-trigger professor-syllabus-link"
-    link.target = "_blank"
-    link.rel = "noopener noreferrer"
-    link.textContent = "Syllabus"
-    wrapper.appendChild(link)
-  }
+  wrapper.appendChild(trigger)
 
   td.appendChild(wrapper)
   return td
@@ -810,30 +788,7 @@ function getCourseColor(course){
 
 function downloadCalendar(){
   const visible = getVisibleEvents()
-  const timestampDate = formatLocalDate(new Date())
-  const lines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//DEN//Horario 2026//ES",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH"
-  ]
-
-  visible.forEach((event, index) => {
-    event.timeBlocks.forEach((block, blockIndex) => {
-      lines.push("BEGIN:VEVENT")
-      lines.push(`UID:den-${index}-${blockIndex}@udd.cl`)
-      lines.push(`DTSTAMP:${toICSDateTime(timestampDate, "00:00")}`)
-      lines.push(`DTSTART:${toICSDateTime(event.date, block.start)}`)
-      lines.push(`DTEND:${toICSDateTime(event.date, block.end)}`)
-      lines.push(`SUMMARY:${escapeICS(event.course)}`)
-      lines.push(`DESCRIPTION:${escapeICS(buildDescription(event))}`)
-      lines.push(`LOCATION:${escapeICS(event.location || "Por definir")}`)
-      lines.push("END:VEVENT")
-    })
-  })
-
-  lines.push("END:VCALENDAR")
+  const lines = buildCalendarLines(visible)
 
   const blob = new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" })
   const url = URL.createObjectURL(blob)
@@ -844,10 +799,61 @@ function downloadCalendar(){
   URL.revokeObjectURL(url)
 }
 
+function buildCalendarLines(events){
+  const timestampDate = formatLocalDate(new Date())
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//DEN//Horario 2026//ES",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH"
+  ]
+
+  events.forEach((event, index) => {
+    if(event.timeBlocks.length){
+      event.timeBlocks.forEach((block, blockIndex) => {
+        lines.push("BEGIN:VEVENT")
+        lines.push(`UID:den-${index}-${blockIndex}@udd.cl`)
+        lines.push(`DTSTAMP:${toICSDateTime(timestampDate, "00:00")}`)
+        lines.push(`DTSTART:${toICSDateTime(event.date, block.start)}`)
+        lines.push(`DTEND:${toICSDateTime(event.date, block.end)}`)
+        lines.push(`SUMMARY:${escapeICS(event.course)}`)
+        lines.push(`DESCRIPTION:${escapeICS(buildDescription(event))}`)
+        lines.push(`LOCATION:${escapeICS(event.location || "Por definir")}`)
+        lines.push("END:VEVENT")
+      })
+      return
+    }
+
+    lines.push("BEGIN:VEVENT")
+    lines.push(`UID:den-${index}-allday@udd.cl`)
+    lines.push(`DTSTAMP:${toICSDateTime(timestampDate, "00:00")}`)
+    lines.push(`DTSTART;VALUE=DATE:${event.date.replace(/-/g, "")}`)
+    lines.push(`DTEND;VALUE=DATE:${addDays(event.date, 1).replace(/-/g, "")}`)
+    lines.push(`SUMMARY:${escapeICS(event.course)}`)
+    lines.push(`DESCRIPTION:${escapeICS(buildDescription(event))}`)
+    lines.push(`LOCATION:${escapeICS(event.location || "Por definir")}`)
+    lines.push("END:VEVENT")
+  })
+
+  lines.push("END:VCALENDAR")
+  return lines
+}
+
 function buildDescription(event){
   const professor = event.professor || "Sin profesor asignado"
   const specialChange = event.specialChange ? ` | Nota: ${event.specialChange}` : ""
   return `Profesor: ${professor} | Horario: ${event.time || "Por definir"} | Lugar: ${normalizeLocationLabel(event.location)}${specialChange}`
+}
+
+function addDays(date, amount){
+  const value = new Date(`${date}T00:00:00`)
+  value.setDate(value.getDate() + amount)
+  return formatLocalDate(value)
+}
+
+function getCalendarSubscriptionUrl(){
+  return "webcal://sebabecerra.github.io/Horario_DEN_GEN_2026/calendar.ics"
 }
 
 function toICSDateTime(date, time){
