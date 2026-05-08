@@ -95,9 +95,48 @@ function bindEvents(){
   })
 
   dom.resetFilters.addEventListener("click", resetFilters)
-  dom.downloadICS.addEventListener("click", downloadCalendar)
+  if(dom.downloadICS){
+    dom.downloadICS.addEventListener("click", downloadCalendar)
+  }
   if(dom.subscribeICS){
-    dom.subscribeICS.href = getCalendarSubscriptionUrl()
+    dom.subscribeICS.addEventListener("click", copyCalendarFeedUrl)
+  }
+}
+
+async function copyCalendarFeedUrl(){
+  const feedUrl = getCalendarFeedUrl()
+  const hint = document.getElementById("subscribeHint")
+  const defaultHint = "Copia el link para Google Calendar"
+
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(feedUrl)
+    }else{
+      const helper = document.createElement("textarea")
+      helper.value = feedUrl
+      helper.setAttribute("readonly", "")
+      helper.style.position = "absolute"
+      helper.style.left = "-9999px"
+      document.body.appendChild(helper)
+      helper.select()
+      document.execCommand("copy")
+      document.body.removeChild(helper)
+    }
+
+    if(hint){
+      hint.textContent = "Link copiado"
+      window.setTimeout(() => {
+        hint.textContent = defaultHint
+      }, 2200)
+    }
+  }catch(error){
+    console.error("No se pudo copiar el link del calendario.", error)
+    if(hint){
+      hint.textContent = "No se pudo copiar"
+      window.setTimeout(() => {
+        hint.textContent = defaultHint
+      }, 2200)
+    }
   }
 }
 
@@ -864,8 +903,8 @@ function addDays(date, amount){
   return formatLocalDate(value)
 }
 
-function getCalendarSubscriptionUrl(){
-  return "webcal://sebabecerra.github.io/Horario_DEN_GEN_2026/calendar.ics"
+function getCalendarFeedUrl(){
+  return "https://sebabecerra.github.io/Horario_DEN_GEN_2026/calendar.ics"
 }
 
 function toICSDateTime(date, time){
