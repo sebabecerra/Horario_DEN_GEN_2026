@@ -12,6 +12,7 @@ const scholarLinks = {
 }
 
 const courseSyllabusLinks = {
+  "DEN3C111": "syllabi/metodos-cuantitativos-den3c111-claudio-aqueveque.pdf",
   "DEN3C112": "syllabi/fundamentos-den3c112-nelyda-campos.pdf",
   "DEN3C113": "syllabi/management-den3c113-luis-torres.pdf",
   "DEN3C114": "syllabi/research-method-den3c114-carlos-poblete.pdf"

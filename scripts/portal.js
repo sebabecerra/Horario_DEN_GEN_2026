@@ -15,7 +15,7 @@ const facultyRoster = [
   { name: "Luis Torres", group: "Claustro", syllabus: "syllabi/management-den3c113-luis-torres.pdf" },
   { name: "Felipe Vásquez", group: "Claustro" },
   { name: "Marcos Vergara", group: "Claustro" },
-  { name: "Claudio Aqueveque", group: "Colaborador" },
+  { name: "Claudio Aqueveque", group: "Colaborador", syllabus: "syllabi/metodos-cuantitativos-den3c111-claudio-aqueveque.pdf" },
   { name: "Florencia Gabrielli", group: "Colaborador" },
   { name: "Alejandra Parrao", group: "Colaborador" },
   { name: "Jean Sepúlveda", group: "Colaborador" },
